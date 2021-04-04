@@ -1,0 +1,86 @@
+version: '3'
+
+services:
+  php-worker:
+    image: intmer/supervisor-php7.2-laravel
+    volumes:
+      - ./docker/php-worker/supervisord.conf:/etc/supervisor/conf.d/supervisord.conf
+      - ./docker/php-worker/logs:/var/worker/logs/
+      - ./application:/var/www
+    networks:
+      - backend
+  php:
+    image: atillay/lemp-php
+    volumes:
+      - ./docker/php/php.ini:/usr/local/etc/php/php.ini
+      - ./application:/var/www
+    ports:
+      - 9000:9000
+    networks:
+      - backend
+
+  nginx:
+    image: staticfloat/nginx-certbot
+    ports:
+      - 80:80
+      - 443:443
+    environment:
+      CERTBOT_EMAIL: leonardo@laitsoft.com
+    volumes:
+      - ./docker/nginx/prod/nginx.conf:/etc/nginx/user.conf.d/nginx.conf
+      - ./docker/letsencrypt:/etc/letsencrypt
+      - ./docker/nginx/log:/var/log/nginx
+      - ./application/public:/var/www/public
+    networks:
+      - backend
+    links:
+      - php
+    depends_on:
+      - php
+  mysql:
+    image: mysql:5.7
+    ports:
+      - 10001:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=456213456dsa456ADS456dsa45621345
+      - MYSQL_DATABASE=app
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=LKhi9217hy3987hsdauty213
+    volumes:
+      - ./docker/mysql/custom.cnf:/etc/mysql/conf.d/custom.cnf
+      - ./data/mysql:/var/lib/mysql
+    networks:
+      - backend
+  redis:
+    image: redis:latest
+    volumes:
+      - ./data/redis:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - backend
+  echo-server:
+    image: oanhnn/laravel-echo-server
+    volumes:
+      - ./docker/laravel-echo-server/prod/laravel-echo-server.json:/app/laravel-echo-server.json
+    ports:
+      - "6001:6001"
+    networks:
+      - backend
+  hub:
+    image: selenium/hub:3.141.59-20200525
+    ports:
+      - "4444:4444"
+  chrome:
+    image: selenium/node-chrome:3.141.59-20200525
+    volumes:
+      - /dev/shm:/dev/shm
+    environment:
+      HUB_HOST: hub
+      HUB_PORT: 4444
+    deploy:
+      replicas: 1
+    entrypoint: bash -c 'SE_OPTS="-host $$HOSTNAME" /opt/bin/entry_point.sh'
+networks:
+  backend:
+    external: true
