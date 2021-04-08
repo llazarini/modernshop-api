@@ -17,7 +17,8 @@ class CreateProductsTable extends Migration
             $table->increments('id');
             $table->unsignedInteger('company_id');
             $table->string('name');
-            $table->string('code')->nullable();
+            $table->string('description', 1000)->nullable();
+            $table->string('slug')->nullable();
             $table->timestamps();
             $table->softDeletes();
 

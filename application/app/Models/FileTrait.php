@@ -11,9 +11,6 @@ trait FileTrait
         static::created(function($record) {
             $request = request();
             Log::debug(self::class);
-            Log::debug($request->get('request_token'));
-            Log::debug($request->get('request_token'));
-            Log::debug($record->id);
             File::whereType(self::class)
                 ->whereRequestToken($request->get('request_token'))
                 ->update([

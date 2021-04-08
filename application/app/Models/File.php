@@ -3,12 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class File extends BaseModel
 {
     public function toArray() {
         $row = parent::toArray();
-        $row['url'] = url(Storage::url("{$this->attributes['type']}/{$this->attributes['name']}"));
+        $typeUrl = Str::slug($this->attributes['type']);
+        $row['url'] = url(Storage::url("{$typeUrl}/{$this->attributes['name']}"));
         return $row;
     }
 }

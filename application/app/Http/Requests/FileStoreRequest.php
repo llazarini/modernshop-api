@@ -15,6 +15,7 @@ class FileStoreRequest extends FormRequest
     {
         return [
             'file' => ['required', 'file'],
+            'type' => ['required']
         ];
     }
 }

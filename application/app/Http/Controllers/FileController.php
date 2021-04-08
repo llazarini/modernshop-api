@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\UserType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class FileController extends Controller
 {
@@ -23,7 +24,8 @@ class FileController extends Controller
         $file->size = $requestFile->getSize();
         $file->type = $request->get('type');
         $file->type_id = $request->get('type_id');
-        Storage::put("public/{$file->type}", $requestFile);
+        $typeUrl = Str::slug($file->type);
+        Storage::put("public/{$typeUrl}", $requestFile);
         if(!$file->save()) {
             return response()->json([
                 'message' => __("Erro ao tentar fazer upload."),

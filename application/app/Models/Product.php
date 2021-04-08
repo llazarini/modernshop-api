@@ -10,13 +10,11 @@ class Product extends BaseModel
 
     public static $searchFields = ['name'];
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
     protected $fillable = [
         'sku', 'name', 'description', 'meta_name', 'meta_description', 'meta_keys', 'stock', 'price', 'price_cost'
     ];
 
+    public function categories() {
+        return $this->belongsToMany(Category::class, 'product_category');
+    }
 }
