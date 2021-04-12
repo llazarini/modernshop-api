@@ -18,4 +18,8 @@ class Category extends BaseModel
     protected $fillable = [
         'slug', 'name', 'description',
     ];
+
+    public function products() {
+        return $this->belongsToMany(Product::class, 'product_category');
+    }
 }

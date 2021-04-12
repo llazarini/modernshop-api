@@ -1,24 +1,26 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Auth;
 
-use App\Models\BannerCategory;
+use App\Http\Controllers\Controller;
+use App\Models\Category;
+use App\Models\Product;
 use Illuminate\Http\Request;
 
-class BannerCategoriesController extends Controller
+class ProductsController extends Controller
 {
     public function index(Request $request)
     {
         $user = $request->user();
-        $data = BannerCategory::paginate(10);
+        $data = Product::paginate(10);
         return response()->json($data, 200);
     }
 
     public function get(Request $request, $id)
     {
         $user = $request->user();
-        $data = BannerCategory::whereCompanyId($user->company_id)
-            ->with('banners')
+        $data = Product::whereCompanyId($user->company_id)
+            ->with(['categories'])
             ->find($id);
         if(!$data) {
             return response()->json([
@@ -30,8 +32,8 @@ class BannerCategoriesController extends Controller
 
     public function dataprovider(Request $request)
     {
-        $user = $request->user();
-        return response()->json([], 200);
+        $categories = Category::get();
+        return response()->json(compact('categories'), 200);
     }
 
     public function update(Request $request, $id)
@@ -40,16 +42,17 @@ class BannerCategoriesController extends Controller
             'name' => ['required'],
         ]);
         $user = $request->user();
-        $data = BannerCategory::whereCompanyId($user->company_id)
+        $product = Product::whereCompanyId($user->company_id)
             ->find($id);
-        $data->fill($request->all());
-        if(!$data->save()) {
+        $product->fill($request->all());
+        if(!$product->save()) {
             return response()->json([
                 'message' => __("Ocorreu um erro ao tentar salvar o produto."),
             ], 400);
         }
+        $product->categories()->sync($request->get('categories'));
         return response()->json([
-            'data' => $data,
+            'data' => $product,
             'message' => __('Produto atualizado com sucesso.'),
         ], 200);
     }
@@ -60,14 +63,15 @@ class BannerCategoriesController extends Controller
         $request->validate([
             'name' => ['required'],
         ]);
-        $data = new BannerCategory();
-        $data->company_id = $user->company_id;
-        $data->fill($request->all());
-        if(!$data->save()) {
+        $product = new Product();
+        $product->company_id = $user->company_id;
+        $product->fill($request->all());
+        if(!$product->save()) {
             return response()->json([
                 'message' => __("Erro ao tentar cadastrar."),
             ], 400);
         }
+        $product->categories()->sync($request->get('categories'));
         return response()->json([
             'message' => __('Produto criado com sucesso.'),
         ], 200);
@@ -76,7 +80,7 @@ class BannerCategoriesController extends Controller
     public function delete(Request $request, $id)
     {
         $user = $request->user();
-        $data = BannerCategory::whereCompanyId($user->company_id)
+        $data = Product::whereCompanyId($user->company_id)
             ->find($id);
         if(!$data->delete()) {
             return response()->json([

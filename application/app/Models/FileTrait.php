@@ -28,7 +28,7 @@ trait FileTrait
     }
 
     public function files() {
-        return $this->morphMany(File::class, 'type');
+        return $this->morphMany(File::class, 'type', 'type', 'type_id');
     }
 
     public function file() {

@@ -1,25 +1,24 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Auth;
 
+use App\Http\Controllers\Controller;
 use App\Models\Category;
-use App\Models\Product;
 use Illuminate\Http\Request;
 
-class ProductsController extends Controller
+class CategoriesController extends Controller
 {
     public function index(Request $request)
     {
         $user = $request->user();
-        $data = Product::paginate(10);
+        $data = Category::paginate(10);
         return response()->json($data, 200);
     }
 
     public function get(Request $request, $id)
     {
         $user = $request->user();
-        $data = Product::whereCompanyId($user->company_id)
-            ->with(['categories'])
+        $data = Category::whereCompanyId($user->company_id)
             ->find($id);
         if(!$data) {
             return response()->json([
@@ -31,8 +30,8 @@ class ProductsController extends Controller
 
     public function dataprovider(Request $request)
     {
-        $categories = Category::get();
-        return response()->json(compact('categories'), 200);
+        $user = $request->user();
+        return response()->json([], 200);
     }
 
     public function update(Request $request, $id)
@@ -41,17 +40,16 @@ class ProductsController extends Controller
             'name' => ['required'],
         ]);
         $user = $request->user();
-        $product = Product::whereCompanyId($user->company_id)
+        $data = Category::whereCompanyId($user->company_id)
             ->find($id);
-        $product->fill($request->all());
-        if(!$product->save()) {
+        $data->fill($request->all());
+        if(!$data->save()) {
             return response()->json([
                 'message' => __("Ocorreu um erro ao tentar salvar o produto."),
             ], 400);
         }
-        $product->categories()->sync($request->get('categories'));
         return response()->json([
-            'data' => $product,
+            'data' => $data,
             'message' => __('Produto atualizado com sucesso.'),
         ], 200);
     }
@@ -62,15 +60,14 @@ class ProductsController extends Controller
         $request->validate([
             'name' => ['required'],
         ]);
-        $product = new Product();
-        $product->company_id = $user->company_id;
-        $product->fill($request->all());
-        if(!$product->save()) {
+        $data = new Category();
+        $data->company_id = $user->company_id;
+        $data->fill($request->all());
+        if(!$data->save()) {
             return response()->json([
                 'message' => __("Erro ao tentar cadastrar."),
             ], 400);
         }
-        $product->categories()->sync($request->get('categories'));
         return response()->json([
             'message' => __('Produto criado com sucesso.'),
         ], 200);
@@ -79,7 +76,7 @@ class ProductsController extends Controller
     public function delete(Request $request, $id)
     {
         $user = $request->user();
-        $data = Product::whereCompanyId($user->company_id)
+        $data = Category::whereCompanyId($user->company_id)
             ->find($id);
         if(!$data->delete()) {
             return response()->json([
@@ -87,7 +84,7 @@ class ProductsController extends Controller
             ], 400);
         }
         return response()->json([
-            'message' => __('Produto removido com sucesso.'),
+            'message' => __('Categoria removida com sucesso.'),
         ]);
     }
 }

@@ -13,4 +13,8 @@ class BannerCategory extends BaseModel
     protected $fillable = [
         'slug', 'name',
     ];
+
+    public function banners() {
+        return $this->hasMany(Banner::class);
+    }
 }

@@ -1,18 +1,34 @@
 <?php
 
-use App\Http\Controllers\AddressController;
-use App\Http\Controllers\BannerCategoriesController;
-use App\Http\Controllers\CategoriesController;
-use App\Http\Controllers\FileController;
-use App\Http\Controllers\ProductsController;
-use App\Http\Controllers\StatesController;
+use App\Http\Controllers\Auth\AddressController;
+use App\Http\Controllers\Auth\BannerCategoriesController;
+use App\Http\Controllers\Auth\CategoriesController;
+use App\Http\Controllers\Auth\FileController;
+use App\Http\Controllers\Auth\ProductsController;
+use App\Http\Controllers\Guest\ProductsController as GuestProductsController;
+use App\Http\Controllers\Auth\StatesController;
 use App\Http\Controllers\UsersController;
 use Illuminate\Support\Facades\Route;
 
-Route::post('login', ['as' => 'login', 'uses' => 'UsersController@login']);
+Route::post('auth/login', ['as' => 'login', 'uses' => 'UsersController@login']);
 
-Route::group(['middleware' => 'auth:sanctum'], function() {
+Route::group(['prefix' => '/states'], function () {
+    Route::get('/get-cities', [StatesController::class, 'getCities']);
+});
+Route::group(['prefix' => 'guest'], function() {
+    Route::group(['prefix' => '/products'], function () {
+        Route::get('/index', [GuestProductsController::class, 'index']);
+        Route::get('/category', [GuestProductsController::class, 'category']);
+        Route::get('/show', [GuestProductsController::class, 'show']);
+        Route::get('/dataprovider', [GuestProductsController::class, 'dataprovider']);
+    });
 
+    Route::group(['prefix' => '/banners'], function () {
+        Route::get('/category', [\App\Http\Controllers\Guest\BannersController::class, 'category']);
+    });
+});
+
+Route::group(['middleware' => 'auth:sanctum', 'prefix' => 'auth'], function() {
     Route::group(['prefix' => '/address'], function () {
         Route::get('/postal_code', [AddressController::class]);
     });

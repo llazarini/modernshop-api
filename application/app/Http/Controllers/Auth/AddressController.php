@@ -1,20 +1,11 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Auth;
 
-use App\Models\AccountingPlan;
+use App\Http\Controllers\Controller;
 use App\Models\City;
-use App\Models\Client;
-use App\Models\ClientAddress;
-use App\Models\ClientContact;
-use App\Models\CostCenter;
-use App\Models\Activity;
-use App\Models\SecondaryActivity;
 use App\Models\State;
-use App\Models\TaxRegime;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 
 class AddressController extends Controller
 {
