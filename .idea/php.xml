@@ -133,6 +133,7 @@
       <path value="$PROJECT_DIR$/application/vendor/evenement/evenement" />
       <path value="$PROJECT_DIR$/application/vendor/ringcentral/psr7" />
       <path value="$PROJECT_DIR$/application/vendor/laravel/sanctum" />
+      <path value="$PROJECT_DIR$/application/vendor/pagarme/pagarme-php" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="7.3" />

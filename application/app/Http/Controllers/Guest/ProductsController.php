@@ -34,7 +34,7 @@ class ProductsController extends Controller
             ->join('product_category', 'product_category.product_id', 'products.id')
             ->groupBy('products.id')
             ->where('product_category.category_id', $category->id)
-            ->paginate(10);
+            ->paginate(4);
         return response()->json($data);
     }
 

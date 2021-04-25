@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\BannerCategoriesController;
 use App\Http\Controllers\Auth\CategoriesController;
 use App\Http\Controllers\Auth\FileController;
 use App\Http\Controllers\Auth\ProductsController;
+use App\Http\Controllers\Guest\CheckoutController;
 use App\Http\Controllers\Guest\ProductsController as GuestProductsController;
 use App\Http\Controllers\Auth\StatesController;
 use App\Http\Controllers\UsersController;
@@ -26,14 +27,31 @@ Route::group(['prefix' => 'guest'], function() {
     Route::group(['prefix' => '/banners'], function () {
         Route::get('/category', [\App\Http\Controllers\Guest\BannersController::class, 'category']);
     });
+
+    Route::group(['prefix' => '/checkout'], function () {
+        Route::get('/basic', [CheckoutController::class, 'basic']);
+        Route::post('/create', [CheckoutController::class, 'create']);
+        Route::post('/shipment', [CheckoutController::class, 'shipment']);
+    });
+
+    Route::group(['middleware' => 'auth:sanctum'], function() {
+        Route::get('auth/me', [UsersController::class, 'me']);
+
+        Route::group(['prefix' => '/checkout'], function () {
+            Route::post('/address', [CheckoutController::class, 'address']);
+            Route::post('/payment', [CheckoutController::class, 'payment']);
+        });
+    });
+
 });
 
 Route::group(['middleware' => 'auth:sanctum', 'prefix' => 'auth'], function() {
     Route::group(['prefix' => '/address'], function () {
-        Route::get('/postal_code', [AddressController::class]);
+        Route::get('/zip_code', [AddressController::class, 'postalCode']);
     });
 
     Route::group(['prefix' => '/states'], function () {
+        Route::get('/get-all', [StatesController::class, 'index']);
         Route::get('/get-cities', [StatesController::class, 'getCities']);
     });
 

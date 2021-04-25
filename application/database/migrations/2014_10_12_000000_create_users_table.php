@@ -21,6 +21,7 @@ class CreateUsersTable extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->string('cpf', 11)->nullable();
             $table->string('phone', 14)->nullable();
             $table->rememberToken();
             $table->timestamps();
@@ -43,8 +44,9 @@ class CreateUsersTable extends Migration
             $table->string('zip_code', 20);
             $table->string('street_name');
             $table->string('street_number', 20);
-            $table->string('complement', 40)->nullable();
-            $table->string('reference', 256)->nullable();
+            $table->string('neighborhooed', 100);
+            $table->string('complement', 100)->nullable();
+            $table->string('reference', 100)->nullable();
             $table->timestamps();
             $table->softDeletes();
             $table->foreign('user_id')

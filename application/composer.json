@@ -16,6 +16,7 @@
         "laravel/framework": "^8.0",
         "laravel/sanctum": "^2.6",
         "laravel/tinker": "^2.0",
+        "pagarme/pagarme-php": "^4.1",
         "spatie/crawler": "^5.0",
         "symfony/css-selector": "^5.1",
         "symfony/dom-crawler": "^5.1"

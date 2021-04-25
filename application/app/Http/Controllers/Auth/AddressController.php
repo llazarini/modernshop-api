@@ -11,20 +11,17 @@ class AddressController extends Controller
 {
     public function postalCode(Request $request) {
         $request->validate([
-           'postal_code' => ['required', 'digits:8', 'numeric']
+           'zip_code' => ['required', 'digits:8', 'numeric']
         ]);
-
-        $response = json_decode(file_get_contents('https://viacep.com.br/ws/'.$request->get('postal_code').'/json/'));
-
+        $response = json_decode(file_get_contents('https://viacep.com.br/ws/'.$request->get('zip_code').'/json/'));
         $state = State::whereCode($response->uf)
             ->first();
         $city = City::whereIso($response->ibge)
             ->first();
         $object['state_id'] = $state->id;
         $object['city_id'] = $city->id;
-        $object['address'] = $response->logradouro;
+        $object['street_name'] = $response->logradouro;
         $object['neighborhood'] = $response->bairro;
-
         return response()->json($object);
     }
 }

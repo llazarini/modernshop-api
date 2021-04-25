@@ -11,14 +11,23 @@ use Illuminate\Support\Facades\Hash;
 
 class UsersController extends Controller
 {
-    public function login(Request $request) {
+    public function me(Request $request)
+    {
+        $user = User::with('mainAddress')
+            ->find($request->user()->id);
+        return response()->json($user);
+    }
+
+    public function login(Request $request)
+    {
         $credentials = request(['email', 'password']);
         if (!Auth::attempt($credentials)) {
             return response()->json([
                 'message' => __("E-mail ou senha inválidos.")
             ], 400);
         }
-        $user = User::where('email', $request->email)->first();
+        $user = User::where('email', $request->email)
+            ->first();
         if (!Hash::check($request->password, $user->password, [])) {
             return response()->json([
                 'message' => __("Erro ao verificar a senha.")
@@ -28,12 +37,9 @@ class UsersController extends Controller
         return response()->json([
             'user' => $user,
             'token' => $tokenResult,
-        ], 200);
+        ]);
     }
 
-    /**
-     * Get all
-     */
     public function index(Request $request)
     {
         $user = $request->user();
@@ -43,10 +49,6 @@ class UsersController extends Controller
         return response()->json($data, 200);
     }
 
-
-    /**
-     * Get
-     */
     public function get(Request $request, $id)
     {
         $user = $request->user();
@@ -60,9 +62,6 @@ class UsersController extends Controller
         return response()->json($data, 200);
     }
 
-    /**
-     * Update
-     */
     public function update(Request $request, $id)
     {
         $request->validate([
@@ -86,9 +85,6 @@ class UsersController extends Controller
         ], 200);
     }
 
-    /**
-     * Store
-     */
     public function store(Request $request)
     {
         $user = $request->user();
