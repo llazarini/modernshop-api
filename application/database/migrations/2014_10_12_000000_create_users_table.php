@@ -44,7 +44,7 @@ class CreateUsersTable extends Migration
             $table->string('zip_code', 20);
             $table->string('street_name');
             $table->string('street_number', 20);
-            $table->string('neighborhooed', 100);
+            $table->string('neighborhood', 100);
             $table->string('complement', 100)->nullable();
             $table->string('reference', 100)->nullable();
             $table->timestamps();

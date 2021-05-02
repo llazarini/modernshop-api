@@ -2,20 +2,32 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\ForgotPasswordEmail;
 use App\Models\User;
+use App\Models\UserAddress;
 use App\Models\UserType;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 
 class UsersController extends Controller
 {
     public function me(Request $request)
     {
-        $user = User::with('mainAddress')
+        $user = User::with('main_address.city.state')
             ->find($request->user()->id);
         return response()->json($user);
+    }
+
+    public function forgot(Request $request)
+    {
+        $request->validate([
+            'email' => ['required', 'email']
+        ]);
+        Mail::send(new ForgotPasswordEmail($request->get('email')));
+        return response()->json(true);
     }
 
     public function login(Request $request)
@@ -27,6 +39,7 @@ class UsersController extends Controller
             ], 400);
         }
         $user = User::where('email', $request->email)
+            ->with('main_address')
             ->first();
         if (!Hash::check($request->password, $user->password, [])) {
             return response()->json([
@@ -40,90 +53,53 @@ class UsersController extends Controller
         ]);
     }
 
-    public function index(Request $request)
-    {
-        $user = $request->user();
-        $data = User::whereCompanyId($user->company_id)
-            ->whereUserTypeId(UserType::getId('user'))
-            ->paginate(10);
-        return response()->json($data, 200);
-    }
-
-    public function get(Request $request, $id)
-    {
-        $user = $request->user();
-        $data = User::whereCompanyId($user->company_id)
-            ->find($id);
-        if(!$data) {
-            return response()->json([
-                'message' => __("Erro ao tentar retornar registro."),
-            ], 400);
-        }
-        return response()->json($data, 200);
-    }
-
-    public function update(Request $request, $id)
+    public function create(Request $request)
     {
         $request->validate([
-            'name' => ['required'],
-            'email' => ['required', 'email', sprintf('unique:users,email,%s', $id)],
-            'hourly_rate' => ['required', 'numeric'],
-        ]);
-        $user = $request->user();
-        $data = User::whereCompanyId($user->company_id)
-            ->whereUserTypeId(UserType::getId('user'))
-            ->find($id);
-        $data->fill($request->all());
-        if(!$data->save()) {
-            return response()->json([
-                'message' => __("Ocorreu um erro ao tentar salvar o cliente."),
-            ], 400);
-        }
-        return response()->json([
-            'data' => $data,
-            'message' => __('Usere atualizado com sucesso.'),
-        ], 200);
-    }
-
-    public function store(Request $request)
-    {
-        $user = $request->user();
-        $request->validate([
-            'name' => ['required'],
             'email' => ['required', 'email', 'unique:users,email'],
-            'hourly_rate' => ['required', 'numeric'],
+            'name' => ['required', 'max:200', 'min:10'],
+            'password' => ['required', 'min:6', 'max:200', 'same:password'],
+            'password_confirm' => ['required', 'min:6', 'max:200'],
         ]);
-        $data = new User();
-        $data->user_type_id = UserType::getId('user');
-        $data->password = 'none';
-        $data->company_id = $user->company_id;
-        $data->fill($request->all());
-        if(!$data->save()) {
+        $user = new User();
+        $user->company_id = 1;
+        $user->user_type_id = UserType::getId('client');
+        $user->fill($request->all());
+        if (!$user->save()) {
             return response()->json([
-                'message' => __("Erro ao tentar cadastrar."),
-            ], 400);
+                'message' => __('Erro ao criar usuário')
+            ]);
         }
+        $tokenResult = $user->createToken('authToken')->plainTextToken;
         return response()->json([
-            'message' => __('Colaborador criado com sucesso.'),
-        ], 200);
+            'user' => $user,
+            'token' => $tokenResult,
+        ]);
     }
 
-    /**
-     * Delete registry
-     */
-    public function delete(Request $request, $id)
+    public function address(Request $request)
     {
         $user = $request->user();
-        $data = User::whereCompanyId($user->company_id)
-            ->whereUserTypeId(UserType::getId('user'))
-            ->find($id);
-        if(!$data->delete()) {
+        $request->validate([
+            'zip_code' => ['required', 'min:8', 'max:8'],
+            'street_name' => ['required', 'min:3'],
+            'street_number' => ['required', 'numeric'],
+            'complement' => ['nullable'],
+            'state_id' => ['required', 'exists:states,id'],
+            'city_id' => ['required', 'exists:cities,id'],
+        ]);
+        UserAddress::whereUserId($user->id)
+            ->update(['main' => false]);
+        $address = new UserAddress();
+        $address->fill($request->all());
+        $address->user_id = $user->id;
+        if (!$address->save()) {
             return response()->json([
-                'message' => __("Erro ao tentar remover."),
+                'message' => __('O endereço não foi cadastrado.')
             ], 400);
         }
         return response()->json([
-            'message' => __('Usere removido com sucesso.'),
-        ], 200);
+            'message' => __('Sucesso ao criar endereço.')
+        ]);
     }
 }

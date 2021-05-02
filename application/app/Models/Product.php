@@ -17,4 +17,8 @@ class Product extends BaseModel
     public function categories() {
         return $this->belongsToMany(Category::class, 'product_category');
     }
+
+    public function options() {
+        return $this->belongsToMany(Option::class, 'product_option');
+    }
 }

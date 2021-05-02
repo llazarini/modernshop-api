@@ -11,4 +11,8 @@ class City extends BaseModel
     protected $fillable = [
         'name', 'slug', 'state_id'
     ];
+
+    public function state() {
+        return $this->belongsTo(State::class);
+    }
 }

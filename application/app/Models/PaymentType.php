@@ -2,20 +2,19 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class PaymentStatus extends Model
+class PaymentType extends BaseModel
 {
-    use SoftDeletes;
+    use SoftDeletes, FileTrait;
 
     protected $fillable = [
-        'name', 'slug'
+        'name'
     ];
 
     public static function slug(string $slug)
     {
-        $type = PaymentStatus::whereSlug($slug)
+        $type = PaymentType::whereSlug($slug)
             ->first();
         return $type ? $type->id : null;
     }

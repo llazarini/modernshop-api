@@ -43,7 +43,8 @@ class ProductsController extends Controller
         $request->validate([
             'id' => ['required', 'exists:products,id']
         ]);
-        $products = Product::with(['files'])->find($request->get('id'));
+        $products = Product::with(['files', 'options'])
+            ->find($request->get('id'));
         return response()->json($products);
     }
 }

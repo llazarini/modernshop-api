@@ -27,7 +27,7 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function mainAddress() {
+    public function main_address() {
         return $this
             ->hasOne(UserAddress::class, 'user_id', 'id')
             ->where('main', '=', true);

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\Option;
 use App\Models\Product;
 use Illuminate\Http\Request;
 
@@ -11,8 +12,8 @@ class ProductsController extends Controller
 {
     public function index(Request $request)
     {
-        $user = $request->user();
-        $data = Product::paginate(10);
+        $data = Product::with(['categories', 'options', 'files'])
+            ->paginate(10);
         return response()->json($data, 200);
     }
 
@@ -20,7 +21,7 @@ class ProductsController extends Controller
     {
         $user = $request->user();
         $data = Product::whereCompanyId($user->company_id)
-            ->with(['categories'])
+            ->with(['categories', 'options', 'files'])
             ->find($id);
         if(!$data) {
             return response()->json([
@@ -33,13 +34,18 @@ class ProductsController extends Controller
     public function dataprovider(Request $request)
     {
         $categories = Category::get();
-        return response()->json(compact('categories'), 200);
+        $options = Option::get();
+        return response()->json(compact('categories', 'options'), 200);
     }
 
     public function update(Request $request, $id)
     {
         $request->validate([
             'name' => ['required'],
+            'options' => ['required', 'array'],
+            'options.*' => ['required', 'exists:options,id'],
+            'categories' => ['nullable', 'array'],
+            'categories.*' => ['required', 'exists:categories,id'],
         ]);
         $user = $request->user();
         $product = Product::whereCompanyId($user->company_id)
@@ -51,6 +57,7 @@ class ProductsController extends Controller
             ], 400);
         }
         $product->categories()->sync($request->get('categories'));
+        $product->options()->sync($request->get('options'));
         return response()->json([
             'data' => $product,
             'message' => __('Produto atualizado com sucesso.'),
@@ -62,6 +69,10 @@ class ProductsController extends Controller
         $user = $request->user();
         $request->validate([
             'name' => ['required'],
+            'options' => ['required', 'array'],
+            'options.*' => ['required', 'exists:options,id'],
+            'categories' => ['nullable', 'array'],
+            'categories.*' => ['required', 'exists:categories,id'],
         ]);
         $product = new Product();
         $product->company_id = $user->company_id;
@@ -72,6 +83,7 @@ class ProductsController extends Controller
             ], 400);
         }
         $product->categories()->sync($request->get('categories'));
+        $product->options()->sync($request->get('options'));
         return response()->json([
             'message' => __('Produto criado com sucesso.'),
         ], 200);

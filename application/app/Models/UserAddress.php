@@ -4,6 +4,8 @@ namespace App\Models;
 
 class UserAddress extends BaseModel
 {
+    protected $with = ['city'];
+
     protected $fillable = [
         'user_id',
         'state_id',
@@ -14,4 +16,12 @@ class UserAddress extends BaseModel
         'neighborhood',
         'complement'
     ];
+
+    public function city() {
+        return $this->belongsTo(City::class);
+    }
+
+    public function state() {
+        return $this->belongsTo(State::class);
+    }
 }
