@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\CreateAccountEmail;
 use App\Mail\ForgotPasswordEmail;
 use App\Models\User;
 use App\Models\UserAddress;
@@ -24,10 +25,43 @@ class UsersController extends Controller
     public function forgot(Request $request)
     {
         $request->validate([
-            'email' => ['required', 'email']
+            'email' => ['required', 'email', 'exists:users,email']
         ]);
-        Mail::send(new ForgotPasswordEmail($request->get('email')));
+        $user = User::whereEmail($request->get('email'))->first();
+        $user->remember_token = md5($user->id . $user->email . time() . rand(1,1000));
+        if (!$user->save()) {
+            return response()->json(['message' => __("Usuário não pode ser salvo")], 400);
+        }
+        Mail::send(new ForgotPasswordEmail($user));
         return response()->json(true);
+    }
+
+    public function remember_token(Request $request)
+    {
+        $request->validate([
+            'code' => ['required', 'exists:users,remember_token'],
+        ]);
+        return response()->json([]);
+    }
+
+    public function password(Request $request)
+    {
+        $request->validate([
+            'code' => ['required', 'exists:users,remember_token'],
+            'password' => ['required', 'min:6', 'max:200', 'same:password_confirm'],
+            'password_confirm' => ['required', 'min:6', 'max:200'],
+        ]);
+        $user = User::whereRememberToken($request->get('code'))->first();
+        $user->remember_token = null;
+        $user->password = Hash::make($request->get('password'));
+        if (!$user->save()) {
+            return response()->json([
+                'message' => __("Erro ao cadastrada nova senha.")
+            ], 400);
+        }
+        return response()->json([
+            'message' => __("Nova senha cadastrada com sucesso.")
+        ]);
     }
 
     public function login(Request $request)
@@ -58,12 +92,13 @@ class UsersController extends Controller
         $request->validate([
             'email' => ['required', 'email', 'unique:users,email'],
             'name' => ['required', 'max:200', 'min:10'],
-            'password' => ['required', 'min:6', 'max:200', 'same:password'],
+            'password' => ['required', 'min:6', 'max:200', 'same:password_confirm'],
             'password_confirm' => ['required', 'min:6', 'max:200'],
         ]);
         $user = new User();
         $user->company_id = 1;
         $user->user_type_id = UserType::getId('client');
+        $user->password = Hash::make($request->get('password'));
         $user->fill($request->all());
         if (!$user->save()) {
             return response()->json([
@@ -71,6 +106,7 @@ class UsersController extends Controller
             ]);
         }
         $tokenResult = $user->createToken('authToken')->plainTextToken;
+        Mail::send(new CreateAccountEmail($user));
         return response()->json([
             'user' => $user,
             'token' => $tokenResult,
@@ -81,6 +117,7 @@ class UsersController extends Controller
     {
         $user = $request->user();
         $request->validate([
+            'id' => ['nullable', 'exists:user_addresses,id'],
             'zip_code' => ['required', 'min:8', 'max:8'],
             'street_name' => ['required', 'min:3'],
             'street_number' => ['required', 'numeric'],
@@ -88,10 +125,25 @@ class UsersController extends Controller
             'state_id' => ['required', 'exists:states,id'],
             'city_id' => ['required', 'exists:cities,id'],
         ]);
-        UserAddress::whereUserId($user->id)
-            ->update(['main' => false]);
+        if ($request->get('id')) {
+            $address = UserAddress::find($request->get('id'));
+        }
+        if (isset($address) &&
+            $address->zip_code == $request->get('zip_code') &&
+            $address->street_name == $request->get('street_name') &&
+            $address->street_number == $request->get('street_number') &&
+            $address->complement == $request->get('complement') &&
+            $address->state_id == $request->get('state_id') &&
+            $address->city_id == $request->get('city_id')
+        ) {
+            return response()->json([
+                'message' => __('O seu endereço foi cadastrado com sucesso.')
+            ]);
+        }
+        UserAddress::whereUserId($user->id)->update(['main' => false]);
         $address = new UserAddress();
         $address->fill($request->all());
+        $address->main = true;
         $address->user_id = $user->id;
         if (!$address->save()) {
             return response()->json([
@@ -99,7 +151,7 @@ class UsersController extends Controller
             ], 400);
         }
         return response()->json([
-            'message' => __('Sucesso ao criar endereço.')
+            'message' => __('O seu endereço foi cadastrado com sucesso.')
         ]);
     }
 }

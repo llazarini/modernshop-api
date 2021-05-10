@@ -32,16 +32,23 @@ class CreateOrdersTable extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('user_id');
+            $table->unsignedInteger('user_address_id');
             $table->unsignedInteger('company_id');
             $table->unsignedInteger('payment_type_id');
             $table->unsignedInteger('payment_status_id');
             $table->double('shipment')->default(0);
             $table->string('shipment_option')->nullable();
             $table->double('discount')->default(0);
+            $table->double('amount_without_shipment')->default(0);
             $table->double('amount_without_discount')->default(0);
             $table->double('amount')->default(0);
             $table->timestamps();
             $table->softDeletes();
+            $table
+                ->foreign('user_address_id')
+                ->references('id')
+                ->on('user_addresses')
+                ->onDelete('no action');
             $table
                 ->foreign('user_id')
                 ->references('id')
@@ -69,6 +76,7 @@ class CreateOrdersTable extends Migration
             $table->unsignedInteger('order_id');
             $table->unsignedInteger('product_id');
             $table->integer('quantity')->default(0);
+            $table->double('price')->default(0);
             $table->double('amount')->default(0);
             $table->timestamps();
             $table->softDeletes();

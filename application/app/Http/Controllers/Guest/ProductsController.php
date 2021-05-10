@@ -18,7 +18,8 @@ class ProductsController extends Controller
 
     public function index(Request $request)
     {
-        $products = Product::with(['files'])->paginate();
+        $products = Product::with(['files'])
+            ->paginate();
         return response()->json($products);
     }
 

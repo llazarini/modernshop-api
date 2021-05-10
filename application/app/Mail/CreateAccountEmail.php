@@ -7,7 +7,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-class ForgotPasswordEmail extends Mailable
+class CreateAccountEmail extends Mailable
 {
     use Queueable, SerializesModels;
     public $user;
@@ -21,9 +21,9 @@ class ForgotPasswordEmail extends Mailable
     {
         return $this
             ->from(env('MAIL_FROM_ADDRESS'), env('APP_NAME'))
-            ->subject("Esqueceu a senha?")
+            ->subject("Conta criada com sucesso!")
             ->to($this->user->email)
             ->bcc(env('MAIL_ADMIN1'), env('MAIL_ADMIN2'))
-            ->view('mail.forgot_password', ['url' => env('APP_STORE_URL') . '/user/password/' . $this->user->remember_token]);
+            ->view('mail.create_account');
     }
 }

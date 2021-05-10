@@ -11,7 +11,16 @@ class OrdersController extends Controller
     public function index(Request $request)
     {
         $user = $request->user();
-        $orders = Order::whereUserId($user->id)
+        $orders = Order::with([
+                'payment_status',
+                'payment_type',
+                'order_products.product',
+                'user_address' => function($with) {
+                    $with->with(['city', 'state']);
+                }
+            ])
+            ->whereUserId($user->id)
+            ->orderBy('id', 'desc')
             ->paginate();
         return response()->json($orders);
     }

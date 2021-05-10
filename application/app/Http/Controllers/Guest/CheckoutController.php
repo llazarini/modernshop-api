@@ -3,14 +3,18 @@
 namespace App\Http\Controllers\Guest;
 
 use App\Http\Controllers\Controller;
+use App\Mail\OrderSuccessEmail;
 use App\Models\Order;
 use App\Models\OrderProduct;
 use App\Models\PaymentStatus;
 use App\Models\PaymentType;
 use App\Models\User;
+use App\Rules\ValidCardDate;
+use App\Rules\ValidCpf;
 use App\Store\Payment\PagarmeCreditCard;
 use App\Store\Shipping\MelhorEnvio;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class CheckoutController extends Controller
 {
@@ -24,7 +28,8 @@ class CheckoutController extends Controller
         return response()->json(!!$user);
     }
 
-    public function shipment(Request $request) {
+    public function shipment(Request $request)
+    {
         $request->validate([
             'postal_code' => ['required'],
             'products' => ['required', 'array'],
@@ -41,7 +46,8 @@ class CheckoutController extends Controller
         return response()->json($shippings);
     }
 
-    public function payment(Request $request) {
+    public function payment(Request $request)
+    {
         $request->validate([
             'products' => ['required', 'array'],
             'products.*.id' => ['required', 'exists:products,id'],
@@ -51,7 +57,8 @@ class CheckoutController extends Controller
             'card.name' => ['required'],
             'card.number' => ['required', 'numeric'],
             'card.cvc' => ['required', 'numeric'],
-            'card.date' => ['required', 'numeric'],
+            'card.date' => ['required', 'numeric', new ValidCardDate],
+            'card.cpf' => ['required', new ValidCpf]
         ]);
         $user = User::with('main_address')
             ->find($request->user()->id);
@@ -71,6 +78,7 @@ class CheckoutController extends Controller
             $request->get('products'), $shipping);
         $order = new Order();
         $order->company_id = 1;
+        $order->user_address_id = $user->main_address->id;
         $order->user_id = $user->id;
         $order->payment_type_id = PaymentType::slug('credit_card');
         $order->payment_status_id = PaymentStatus::slug($payment->status);
@@ -79,6 +87,7 @@ class CheckoutController extends Controller
         $order->shipment = $shipping->price;
         $order->shipment_option = sprintf('%s - %s', $shipping->name, $shipping->company);
         $order->discount = 0;
+        $order->amount_without_shipment = ($payment->paid_amount / 100) - $shipping->price;
         $order->amount = $payment->paid_amount / 100;
         if (!$order->save()) {
             return response()->json([
@@ -90,9 +99,11 @@ class CheckoutController extends Controller
             $orderProduct->order_id = $order->id;
             $orderProduct->product_id = $item->id;
             $orderProduct->quantity = $item->quantity;
-            $orderProduct->amount = $item->unit_price / 100;
+            $orderProduct->price = $item->unit_price / 100;
+            $orderProduct->amount = $orderProduct->price * $orderProduct->quantity;
             $orderProduct->save();
         }
+        Mail::send(new OrderSuccessEmail($order));
         return response()->json([
             'data' => $order,
             'message' => __('Pagamento aprovado')

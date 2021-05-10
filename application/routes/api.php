@@ -34,13 +34,17 @@ Route::group(['prefix' => 'guest'], function() {
         Route::get('/basic', [CheckoutController::class, 'basic']);
         Route::post('/shipment', [CheckoutController::class, 'shipment']);
     });
-    Route::post('/create', [UsersController::class, 'create']);
+    Route::post('/users/create', [UsersController::class, 'create']);
     Route::post('/forgot', [UsersController::class, 'forgot']);
+    Route::post('/remember_token', [UsersController::class, 'remember_token']);
+    Route::post('/password', [UsersController::class, 'password']);
     Route::group(['middleware' => 'auth:sanctum'], function() {
         Route::get('auth/me', [UsersController::class, 'me']);
         Route::group(['prefix' => '/users'], function () {
             Route::post('/address', [UsersController::class, 'address']);
-            Route::post('/payment', [UsersController::class, 'payment']);
+        });
+        Route::group(['prefix' => '/checkout'], function () {
+            Route::post('/payment', [CheckoutController::class, 'payment']);
         });
         Route::group(['prefix' => '/orders'], function () {
             Route::get('/show', [OrdersController::class, 'show']);
