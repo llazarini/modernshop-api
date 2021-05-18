@@ -31,7 +31,8 @@ class OrdersController extends Controller
             'id' => ['required', 'exists:orders,id']
         ]);
         $user = $request->user();
-        $products = Order::whereUserId($user->id)
+        $products = Order::with('payment_status')
+            ->whereUserId($user->id)
             ->find($request->get('id'));
         return response()->json($products);
     }

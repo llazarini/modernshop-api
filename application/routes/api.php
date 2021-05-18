@@ -45,6 +45,7 @@ Route::group(['prefix' => 'guest'], function() {
         });
         Route::group(['prefix' => '/checkout'], function () {
             Route::post('/payment', [CheckoutController::class, 'payment']);
+            Route::post('/pix', [CheckoutController::class, 'pix']);
         });
         Route::group(['prefix' => '/orders'], function () {
             Route::get('/show', [OrdersController::class, 'show']);

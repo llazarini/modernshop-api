@@ -31,6 +31,8 @@ class OrderSuccessEmail extends Mailable
             ->subject("Agradecemos muito pela sua compra!")
             ->to($this->order->user->email)
             ->bcc(env('MAIL_ADMIN1'), env('MAIL_ADMIN2'))
-            ->view('mail.order_success');
+            ->view('mail.order_success', [
+                'order' => $this->order
+            ]);
     }
 }
