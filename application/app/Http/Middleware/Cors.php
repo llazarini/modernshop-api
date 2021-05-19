@@ -16,6 +16,6 @@ class Cors
      */
     public function handle(Request $request, Closure $next)
     {
-        return $next($request)->header('Access-Control-Allow-Origin', env('APP_STORE_URL'));
+        return $next($request)->header('Access-Control-Allow-Origin', '*');
     }
 }
