@@ -14,7 +14,7 @@ class TrustHosts extends Middleware
     public function hosts()
     {
         return [
-            env('APP_URL'),
+            'anaraquelilustracoes.com.br',
             $this->allSubdomainsOfApplicationUrl(),
         ];
     }
