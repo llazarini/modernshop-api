@@ -159,7 +159,7 @@ class CheckoutController extends Controller
         foreach($products as $itemProduct) {
             $product = Product::find($itemProduct['id']);
             $option = Option::find($itemProduct['option_id']);
-            $price = round(((float) $product->price + ($option->type ? (float) $option->price : (float)-$option->price)) * 100, 0);
+            $price = round(((float) $product->price + ($option->type ? (float) $option->price : (float)-$option->price)), 0);
             $total = $total + ($price * (int) $itemProduct['quantity']);
         }
         return $total;
@@ -176,6 +176,7 @@ class CheckoutController extends Controller
             $price = round(((float) $product->price + ($option->type ? (float) $option->price : (float)-$option->price)) * 100, 0);
             $orderProduct = new OrderProduct();
             $orderProduct->order_id = $order->id;
+            $orderProduct->option_id = $option ? $option->id : null;
             $orderProduct->product_id = $product->id;
             $orderProduct->quantity = $itemProduct['quantity'];
             $orderProduct->price = $price;

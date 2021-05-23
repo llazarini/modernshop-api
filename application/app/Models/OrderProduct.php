@@ -13,7 +13,7 @@ class OrderProduct extends BaseModel
     public static $searchFields = ['name'];
 
     protected $fillable = [
-        'order_id', 'product_id', 'quantity', 'price', 'amount',
+        'order_id', 'product_id', 'option_id', 'quantity', 'price', 'amount',
     ];
 
     public function order() {
@@ -22,5 +22,9 @@ class OrderProduct extends BaseModel
 
     public function product() {
         return $this->belongsTo(Product::class);
+    }
+
+    public function option() {
+        return $this->belongsTo(Option::class);
     }
 }

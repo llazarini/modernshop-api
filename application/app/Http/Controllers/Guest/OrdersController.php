@@ -14,7 +14,16 @@ class OrdersController extends Controller
         $orders = Order::with([
                 'payment_status',
                 'payment_type',
-                'order_products.product',
+                'order_products' => function($with) {
+                    $with->with([
+                        'product' => function($with) {
+                            $with->withTrashed();
+                        },
+                        'option' => function($with) {
+                            $with->withTrashed();
+                        }
+                    ]);
+                },
                 'user_address' => function($with) {
                     $with->with(['city', 'state']);
                 }
@@ -31,7 +40,7 @@ class OrdersController extends Controller
             'id' => ['required', 'exists:orders,id']
         ]);
         $user = $request->user();
-        $products = Order::with('payment_status')
+        $products = Order::with(['payment_status', 'payment_type'])
             ->whereUserId($user->id)
             ->find($request->get('id'));
         return response()->json($products);

@@ -72,6 +72,13 @@ Route::group(['middleware' => 'auth:sanctum', 'prefix' => 'auth'], function() {
         Route::delete('/delete/{id}', [UsersController::class, 'delete']);
     });
 
+    Route::group(['prefix' => '/orders'], function () {
+        Route::get('/get/{id}', [\App\Http\Controllers\Auth\OrdersController::class, 'get']);
+        Route::get('/get-all', [\App\Http\Controllers\Auth\OrdersController::class, 'index']);
+        Route::put('/update/{id}', [\App\Http\Controllers\Auth\OrdersController::class, 'update']);
+        Route::delete('/delete/{id}', [\App\Http\Controllers\Auth\OrdersController::class, 'delete']);
+    });
+
     Route::group(['prefix' => '/banners'], function () {
         Route::get('/get/{id}', [BannerCategoriesController::class, 'get']);
         Route::get('/get-all', [BannerCategoriesController::class, 'index']);
