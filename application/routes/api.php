@@ -49,7 +49,7 @@ Route::group(['prefix' => 'guest'], function() {
         });
         Route::group(['prefix' => '/orders'], function () {
             Route::get('/show', [OrdersController::class, 'show']);
-            Route::get('/index', [OrdersController::class, 'index']);
+            Route::get('/user', [OrdersController::class, 'user']);
         });
     });
 });

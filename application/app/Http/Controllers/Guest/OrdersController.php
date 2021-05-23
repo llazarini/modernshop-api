@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 
 class OrdersController extends Controller
 {
-    public function index(Request $request)
+    public function user(Request $request)
     {
         $user = $request->user();
         $orders = Order::with([
