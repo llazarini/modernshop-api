@@ -36,6 +36,8 @@ class CreateOrdersTable extends Migration
             $table->unsignedInteger('company_id');
             $table->unsignedInteger('payment_type_id');
             $table->unsignedInteger('payment_status_id');
+            $table->string('external_type')->nullable();
+            $table->unsignedInteger('external_id')->nullable();
             $table->double('shipment')->default(0);
             $table->string('shipment_option')->nullable();
             $table->double('discount')->default(0);
