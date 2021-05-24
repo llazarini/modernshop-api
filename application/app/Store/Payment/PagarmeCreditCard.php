@@ -5,7 +5,6 @@ namespace App\Store\Payment;
 use App\Models\Option;
 use App\Models\Product;
 use App\Models\User;
-use Illuminate\Support\Facades\Log;
 
 class PagarmeCreditCard implements Payment
 {
@@ -42,7 +41,7 @@ class PagarmeCreditCard implements Payment
         }
         $shippingPrice = round($shipping->price * 100, 0);
         $total = $total + $shippingPrice;
-        $pagarme = new \PagarMe\Client(env('PAGARME_SANDBOX_KEY'));
+        $pagarme = new \PagarMe\Client(env('APP_ENV') === 'debug' ? env('PAGARME_SANDBOX_KEY') : env('PAGARME_LIVE_KEY'));
         $transaction = $pagarme->transactions()->create([
             'amount' => $total,
             'payment_method' => 'credit_card',
