@@ -106,6 +106,7 @@ class UsersController extends Controller
             ]);
         }
         $tokenResult = $user->createToken('authToken')->plainTextToken;
+        $user = User::find($user->id);
         Mail::send(new CreateAccountEmail($user));
         return response()->json([
             'user' => $user,
