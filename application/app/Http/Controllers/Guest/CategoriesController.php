@@ -10,7 +10,9 @@ class CategoriesController extends Controller
 {
     public function index(Request $request)
     {
-        $categories = Category::with('file')->get();
+        $categories = Category::with('file')
+            ->whereHas('file')
+            ->get();
         return response()->json($categories);
     }
 }
