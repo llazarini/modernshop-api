@@ -13,6 +13,7 @@ trait FileTrait
             Log::debug(self::class);
             File::whereType(self::class)
                 ->whereRequestToken($request->get('request_token'))
+                ->whereNull('type_id')
                 ->update([
                     'type_id' => $record->id,
                 ]);
@@ -21,6 +22,7 @@ trait FileTrait
             $request = request();
             File::whereType(self::class)
                 ->whereRequestToken($request->get('request_token'))
+                ->whereNull('type_id')
                 ->update([
                     'type_id' => $record->id,
                 ]);
