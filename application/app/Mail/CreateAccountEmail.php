@@ -19,7 +19,6 @@ class CreateAccountEmail extends Mailable
 
     public function build()
     {
-        throw new \Exception(env('MAIL_FROM_ADDRESS') . env('APP_NAME'));
         $user = $this->user;
         return $this
             ->from(env('MAIL_FROM_ADDRESS'), env('APP_NAME'))
