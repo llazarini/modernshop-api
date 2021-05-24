@@ -173,7 +173,7 @@ class CheckoutController extends Controller
         foreach($request->get('products', []) as $itemProduct) {
             $product = Product::find($itemProduct['id']);
             $option = Option::find($itemProduct['option_id']);
-            $price = round(((float) $product->price + ($option->type ? (float) $option->price : (float)-$option->price)) * 100, 0);
+            $price = (float) $product->price + ($option->type ? (float) $option->price : (float)-$option->price);
             $orderProduct = new OrderProduct();
             $orderProduct->order_id = $order->id;
             $orderProduct->option_id = $option ? $option->id : null;

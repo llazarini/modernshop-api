@@ -19,6 +19,10 @@ Route::group(['prefix' => '/states'], function () {
     Route::get('/get-cities', [StatesController::class, 'getCities']);
 });
 Route::group(['prefix' => 'guest'], function() {
+    Route::group(['prefix' => '/categories'], function () {
+        Route::get('/index', [\App\Http\Controllers\Guest\CategoriesController::class, 'index']);
+    });
+
     Route::group(['prefix' => '/products'], function () {
         Route::get('/index', [GuestProductsController::class, 'index']);
         Route::get('/category', [GuestProductsController::class, 'category']);
@@ -76,7 +80,9 @@ Route::group(['middleware' => 'auth:sanctum', 'prefix' => 'auth'], function() {
         Route::get('/get/{id}', [\App\Http\Controllers\Auth\OrdersController::class, 'get']);
         Route::get('/get-all', [\App\Http\Controllers\Auth\OrdersController::class, 'index']);
         Route::put('/update/{id}', [\App\Http\Controllers\Auth\OrdersController::class, 'update']);
+        Route::put('/status', [\App\Http\Controllers\Auth\OrdersController::class, 'status']);
         Route::delete('/delete/{id}', [\App\Http\Controllers\Auth\OrdersController::class, 'delete']);
+        Route::get('/dataprovider', [\App\Http\Controllers\Auth\OrdersController::class, 'dataprovider']);
     });
 
     Route::group(['prefix' => '/banners'], function () {

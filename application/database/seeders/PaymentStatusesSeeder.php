@@ -17,17 +17,17 @@ class PaymentStatusesSeeder extends Seeder
         $plans = array(
             array(
                 "id" => 1,
-                "name" => "Processando",
+                "name" => "Processando Pagamento",
                 "slug" => "processing",
             ),
             array(
                 "id" => 2,
-                "name" => "Autorizado",
+                "name" => "Pagamento Autorizado",
                 "slug" => "authorized",
             ),
             array(
                 "id" => 3,
-                "name" => "Pago",
+                "name" => "Pagamento aprovado",
                 "slug" => "paid",
             ),
             array(
@@ -47,7 +47,7 @@ class PaymentStatusesSeeder extends Seeder
             ),
             array(
                 "id" => 7,
-                "name" => "Recusado",
+                "name" => "Pagamento Recusado",
                 "slug" => "refused",
             ),
             array(
@@ -64,6 +64,11 @@ class PaymentStatusesSeeder extends Seeder
                 "id" => 10,
                 "name" => "Pendente de Revisão",
                 "slug" => "pending_review",
+            ),
+            array(
+                "id" => 11,
+                "name" => "Pedido enviado",
+                "slug" => "sent",
             ),
         );
         DB::table('payment_statuses')->insert($plans);

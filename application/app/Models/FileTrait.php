@@ -32,6 +32,6 @@ trait FileTrait
     }
 
     public function file() {
-        return $this->morphOne(File::class, 'type');
+        return $this->morphOne(File::class, 'type', 'type', 'type_id');
     }
 }

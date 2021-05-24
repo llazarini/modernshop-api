@@ -3,8 +3,13 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Mail\ForgotPasswordEmail;
+use App\Mail\OrderUpdatedEmail;
 use App\Models\Order;
+use App\Models\PaymentStatus;
+use App\Models\PaymentType;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class OrdersController extends Controller
 {
@@ -44,47 +49,32 @@ class OrdersController extends Controller
 
     public function dataprovider(Request $request)
     {
-        $user = $request->user();
-        return response()->json([], 200);
+        $payment_statuses = PaymentStatus::get();
+        return response()->json(compact('payment_statuses'), 200);
     }
 
-    public function update(Request $request, $id)
+    public function status(Request $request)
     {
         $request->validate([
-            'name' => ['required'],
+            'id' => ['required', 'exists:orders,id'],
+            'status' => ['required', 'exists:payment_statuses,slug']
         ]);
-        $user = $request->user();
-        $data = Order::whereCompanyId($user->company_id)
-            ->find($id);
-        $data->fill($request->all());
-        if(!$data->save()) {
+        $order = Order::find($request->get('id'));
+        if ($order->payment_status_id === PaymentStatus::slug($request->get('status'))) {
             return response()->json([
-                'message' => __("Ocorreu um erro ao tentar salvar o produto."),
-            ], 400);
+                'message' => __('O pedido já se encontra nesse status de atualização.', 400)
+            ]);
         }
+        $order->payment_status_id = PaymentStatus::slug($request->get('status'));
+        if(!$order->save()) {
+            return response()->json([
+                'message' => __('Erro ao atualizar status do pedido.', 400)
+            ]);
+        }
+        Mail::send(new OrderUpdatedEmail($order));
         return response()->json([
-            'data' => $data,
-            'message' => __('Produto atualizado com sucesso.'),
-        ], 200);
-    }
-
-    public function store(Request $request)
-    {
-        $user = $request->user();
-        $request->validate([
-            'name' => ['required'],
+            'message' => __('O status foi atualizado com sucesso.')
         ]);
-        $data = new Order();
-        $data->company_id = $user->company_id;
-        $data->fill($request->all());
-        if(!$data->save()) {
-            return response()->json([
-                'message' => __("Erro ao tentar cadastrar."),
-            ], 400);
-        }
-        return response()->json([
-            'message' => __('Produto criado com sucesso.'),
-        ], 200);
     }
 
     public function delete(Request $request, $id)

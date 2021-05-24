@@ -18,8 +18,16 @@ class ProductsController extends Controller
 
     public function index(Request $request)
     {
-        $products = Product::with(['files'])
-            ->paginate();
+        $request->validate([
+            'category_id' => ['nullable', 'exists:categories,id']
+        ]);
+        $products = Product::with(['files']);
+        if ($request->filled('category_id')) {
+            $products->whereHas('categories', function($has) use ($request) {
+                $has->whereCategoryId($request->get('category_id'));
+            });
+        }
+        $products = $products->paginate(10);
         return response()->json($products);
     }
 
