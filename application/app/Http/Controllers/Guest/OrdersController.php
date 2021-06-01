@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 
 class OrdersController extends Controller
 {
-    public function user(Request $request)
+    public function index(Request $request)
     {
         $user = $request->user();
         $orders = Order::with([
@@ -19,8 +19,9 @@ class OrdersController extends Controller
                         'product' => function($with) {
                             $with->withTrashed();
                         },
-                        'option' => function($with) {
-                            $with->withTrashed();
+                        'options' => function($with) {
+                            $with
+                                ->withTrashed();
                         }
                     ]);
                 },

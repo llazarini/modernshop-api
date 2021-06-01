@@ -9,6 +9,10 @@ class Option extends BaseModel
     use SoftDeletes, FileTrait;
 
     protected $fillable = [
-        'name', 'description', 'price', 'type', 'weight', 'width', 'height', 'length'
+        'name', 'attribute_id', 'description', 'price', 'type', 'weight', 'width', 'height', 'length'
     ];
+
+    public function attribute() {
+        return $this->belongsTo(Attribute::class);
+    }
 }

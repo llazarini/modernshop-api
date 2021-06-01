@@ -5,6 +5,7 @@ namespace App\Store\Payment;
 use App\Models\Option;
 use App\Models\Product;
 use App\Models\User;
+use PagarMe\Client;
 
 class PagarmeCreditCard implements Payment
 {
@@ -28,8 +29,12 @@ class PagarmeCreditCard implements Payment
         $total = 0;
         foreach($products as $itemProduct) {
             $product = Product::find($itemProduct['id']);
-            $option = Option::find($itemProduct['option_id']);
-            $price = round(((float) $product->price + ($option->type ? (float) $option->price : (float)-$option->price)) * 100, 0);
+            $price = 0;
+            foreach($itemProduct['options'] as $optionId) {
+                $option = Option::find($optionId);
+                $price += $option->type ? $option->price : -$option->price;
+            }
+            $price = round((float) $price * 100, 0);
             $items->push([
                 'id' => (string) $product->id,
                 'title' => $product->name,
@@ -41,7 +46,7 @@ class PagarmeCreditCard implements Payment
         }
         $shippingPrice = round($shipping->price * 100, 0);
         $total = $total + $shippingPrice;
-        $pagarme = new \PagarMe\Client(env('APP_ENV') === 'debug' ? env('PAGARME_SANDBOX_KEY') : env('PAGARME_LIVE_KEY'));
+        $pagarme = new Client(env('APP_ENV') === 'production' ? env('PAGARME_LIVE_KEY') : env('PAGARME_SANDBOX_KEY'));
         $transaction = $pagarme->transactions()->create([
             'amount' => $total,
             'payment_method' => 'credit_card',
@@ -60,7 +65,7 @@ class PagarmeCreditCard implements Payment
                         'number' => $card->cpf
                     ]
                 ],
-                'phone_numbers' => ["+55{$user->phone}"],
+                'phone_numbers' => [strlen($user->phone) == 11 ? "+55{$user->phone}" : "+5511972855395"],
                 'email' => $user->email
             ],
             'billing' => [

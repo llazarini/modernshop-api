@@ -21,4 +21,13 @@ class Product extends BaseModel
     public function options() {
         return $this->belongsToMany(Option::class, 'product_option');
     }
+
+    public function attributes() {
+        $attributes = Attribute::whereIn('id', $this->options->pluck('attribute_id'))
+            ->get();
+        foreach($attributes as $attribute) {
+            $attribute->options = Option::whereIn('id', $this->options->where('attribute_id', '=', $attribute->id)->pluck('id'))->get();
+        }
+        return $attributes;
+    }
 }

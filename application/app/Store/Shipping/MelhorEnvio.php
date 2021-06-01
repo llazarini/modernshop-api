@@ -4,6 +4,7 @@ namespace App\Store\Shipping;
 
 use App\Models\Option;
 use App\Models\Product;
+use App\Models\ProductOption;
 use GuzzleHttp\Client;
 
 class MelhorEnvio implements Shipping
@@ -24,7 +25,7 @@ class MelhorEnvio implements Shipping
         ];
         foreach($products as $item) {
             $product = Product::find($item['id']);
-            $option = Option::find($item['option_id']);
+            $option = ProductOption::productProperties($product->id, $item['options']);
             $data['products'][] =     [
                 "id" => $product->id,
                 "weight" => $option->weight / 1000,

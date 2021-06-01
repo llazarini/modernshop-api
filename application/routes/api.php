@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AddressController;
+use App\Http\Controllers\Auth\AttributesController;
 use App\Http\Controllers\Auth\BannerCategoriesController;
 use App\Http\Controllers\Auth\CategoriesController;
 use App\Http\Controllers\Auth\FileController;
@@ -53,7 +54,7 @@ Route::group(['prefix' => 'guest'], function() {
         });
         Route::group(['prefix' => '/orders'], function () {
             Route::get('/show', [OrdersController::class, 'show']);
-            Route::get('/user', [OrdersController::class, 'user']);
+            Route::get('/index', [OrdersController::class, 'index']);
         });
     });
 });
@@ -102,6 +103,14 @@ Route::group(['middleware' => 'auth:sanctum', 'prefix' => 'auth'], function() {
         Route::delete('/delete/{id}', [CategoriesController::class, 'delete']);
     });
 
+    Route::group(['prefix' => '/attributes'], function () {
+        Route::get('/get/{id}', [AttributesController::class, 'get']);
+        Route::get('/get-all', [AttributesController::class, 'index']);
+        Route::post('/store', [AttributesController::class, 'store']);
+        Route::put('/update/{id}', [AttributesController::class, 'update']);
+        Route::delete('/delete/{id}', [AttributesController::class, 'delete']);
+    });
+
     Route::group(['prefix' => '/products'], function () {
         Route::get('/get/{id}', [ProductsController::class, 'get']);
         Route::get('/get-all', [ProductsController::class, 'index']);
@@ -115,6 +124,7 @@ Route::group(['middleware' => 'auth:sanctum', 'prefix' => 'auth'], function() {
         Route::get('/get/{id}', [OptionsController::class, 'get']);
         Route::get('/get-all', [OptionsController::class, 'index']);
         Route::post('/store', [OptionsController::class, 'store']);
+        Route::get('/dataprovider', [OptionsController::class, 'dataprovider']);
         Route::put('/update/{id}', [OptionsController::class, 'update']);
         Route::delete('/delete/{id}', [OptionsController::class, 'delete']);
     });

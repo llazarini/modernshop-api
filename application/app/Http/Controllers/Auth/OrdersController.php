@@ -3,11 +3,9 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Mail\ForgotPasswordEmail;
 use App\Mail\OrderUpdatedEmail;
 use App\Models\Order;
 use App\Models\PaymentStatus;
-use App\Models\PaymentType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 
@@ -24,7 +22,7 @@ class OrdersController extends Controller
                     'product' => function($with) {
                         $with->withTrashed();
                     },
-                    'option' => function($with) {
+                    'options' => function($with) {
                         $with->withTrashed();
                     }
                 ]);

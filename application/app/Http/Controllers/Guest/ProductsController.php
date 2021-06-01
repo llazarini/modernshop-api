@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Guest;
 
 use App\Http\Controllers\Controller;
+use App\Models\Attribute;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\Request;
@@ -52,8 +53,12 @@ class ProductsController extends Controller
         $request->validate([
             'id' => ['required', 'exists:products,id']
         ]);
-        $products = Product::with(['files', 'options'])
+        $product = Product::with([
+                'files',
+                'options'
+            ])
             ->find($request->get('id'));
-        return response()->json($products);
+        $product->attributes = $product->attributes();
+        return response()->json($product);
     }
 }

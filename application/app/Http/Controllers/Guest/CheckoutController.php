@@ -7,6 +7,7 @@ use App\Mail\OrderSuccessEmail;
 use App\Models\Option;
 use App\Models\Order;
 use App\Models\OrderProduct;
+use App\Models\OrderProductOption;
 use App\Models\PaymentStatus;
 use App\Models\PaymentType;
 use App\Models\Product;
@@ -36,7 +37,8 @@ class CheckoutController extends Controller
             'postal_code' => ['required'],
             'products' => ['required', 'array'],
             'products.*.id' => ['required', 'exists:products,id'],
-            'products.*.option_id' => ['required', 'exists:options,id'],
+            'products.*.options' => ['required', 'array'],
+            'products.*.options.*' => ['required', 'exists:options,id'],
             'products.*.quantity' => ['required', 'numeric'],
         ]);
         $shippings = MelhorEnvio::calculate($request->get('postal_code'), $request->get('products'));
@@ -53,7 +55,8 @@ class CheckoutController extends Controller
         $request->validate([
             'products' => ['required', 'array'],
             'products.*.id' => ['required', 'exists:products,id'],
-            'products.*.option_id' => ['required', 'exists:options,id'],
+            'products.*.options' => ['required'],
+            'products.*.options.*' => ['required', 'exists:options,id'],
             'products.*.quantity' => ['required', 'numeric'],
             'shipping_option_id' => ['required', 'numeric'],
             'card.name' => ['required'],
@@ -78,12 +81,14 @@ class CheckoutController extends Controller
         }
         $payment = PagarmeCreditCard::payment($request->get('card'), $request->user(),
             $request->get('products'), $shipping);
+        $status = PaymentStatus::whereSlug($payment->status)
+            ->first();
         $order = new Order();
         $order->company_id = 1;
         $order->user_address_id = $user->main_address->id;
         $order->user_id = $user->id;
         $order->payment_type_id = PaymentType::slug('credit_card');
-        $order->payment_status_id = PaymentStatus::slug($payment->status);
+        $order->payment_status_id = $status->id;
         $order->external_id = $payment->id;
         $order->external_type = 'pagarme';
         $order->shipment = $shipping->price;
@@ -97,6 +102,18 @@ class CheckoutController extends Controller
             ], 400);
         }
         $this->saveOrderItems($order, $request);
+        if (!in_array($status->slug, ['processing', 'authorized', 'paid', 'waiting_payment'])) {
+            return response()->json([
+                'message' => [
+                    'title' => __('Aconteceu algum problema com seu pagamento', [
+                        'status' => $status->name
+                    ]),
+                    'message' => __('Ocorreu algum erro com o seu pagamento, o seu pagamento foi :status. Por favor, revise os dados do seu cartão de crédito.', [
+                        'status' => $status->name
+                    ])
+                ]
+            ], 400);
+        }
         Mail::send(new OrderSuccessEmail($order));
         return response()->json([
             'data' => $order,
@@ -109,7 +126,8 @@ class CheckoutController extends Controller
         $request->validate([
             'products' => ['required', 'array'],
             'products.*.id' => ['required', 'exists:products,id'],
-            'products.*.option_id' => ['required', 'exists:options,id'],
+            'products.*.options' => ['required', 'array'],
+            'products.*.options.*' => ['required', 'exists:options,id'],
             'products.*.quantity' => ['required', 'numeric'],
             'shipping_option_id' => ['required', 'numeric'],
         ]);
@@ -158,8 +176,12 @@ class CheckoutController extends Controller
         $total = 0;
         foreach($products as $itemProduct) {
             $product = Product::find($itemProduct['id']);
-            $option = Option::find($itemProduct['option_id']);
-            $price = round(((float) $product->price + ($option->type ? (float) $option->price : (float)-$option->price)), 0);
+            $price = $product->price;
+            foreach($itemProduct['options'] as $optionId) {
+                $option = Option::find($optionId);
+                $price += $option->type ? (float) $option->price : (float)-$option->price;
+            }
+            $price = round($price, 0);
             $total = $total + ($price * (int) $itemProduct['quantity']);
         }
         return $total;
@@ -172,16 +194,25 @@ class CheckoutController extends Controller
         }
         foreach($request->get('products', []) as $itemProduct) {
             $product = Product::find($itemProduct['id']);
-            $option = Option::find($itemProduct['option_id']);
-            $price = (float) $product->price + ($option->type ? (float) $option->price : (float)-$option->price);
+            $price = 0;
+            foreach($itemProduct['options'] as $optionId) {
+                $option = Option::find($optionId);
+                $price += (float) $product->price + ($option->type ? (float) $option->price : (float)-$option->price);
+            }
             $orderProduct = new OrderProduct();
             $orderProduct->order_id = $order->id;
-            $orderProduct->option_id = $option ? $option->id : null;
             $orderProduct->product_id = $product->id;
             $orderProduct->quantity = $itemProduct['quantity'];
             $orderProduct->price = $price;
             $orderProduct->amount = $price * $orderProduct->quantity;
             $orderProduct->save();
+
+            foreach($itemProduct['options'] as $optionId) {
+                $option = new OrderProductOption();
+                $option->order_product_id = $orderProduct->id;
+                $option->option_id = $optionId;
+                $option->save();
+            }
         }
     }
 }
