@@ -29,7 +29,7 @@ class PagarmeCreditCard implements Payment
         $total = 0;
         foreach($products as $itemProduct) {
             $product = Product::find($itemProduct['id']);
-            $price = 0;
+            $price = $product->price;
             foreach($itemProduct['options'] as $optionId) {
                 $option = Option::find($optionId);
                 $price += $option->type ? $option->price : -$option->price;
