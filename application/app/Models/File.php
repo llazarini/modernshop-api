@@ -10,7 +10,7 @@ class File extends BaseModel
     public function toArray() {
         $row = parent::toArray();
         $typeUrl = Str::slug($this->attributes['type']);
-        $row['url'] = url(Storage::url("{$typeUrl}/{$this->attributes['name']}"));
+        $row['url'] = url(sprintf('image?type=%s&image=%s',$typeUrl, $this->attributes['name']));
         return $row;
     }
 }
