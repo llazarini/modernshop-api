@@ -31,7 +31,7 @@ class ImageController extends Controller
         if (!Storage::makeDirectory("public/{$type}/{$size}")) {
             return response()->redirectTo(public_path('default.png'));
         }
-        $make->save(storage_path("app/public/{$type}/{$size}/{$image}"), 100);
+        $make->save(storage_path("app/public/{$type}/{$size}/{$image}"), 85, 'jpg');
         return response()->redirectTo(Storage::url("public/{$type}/{$size}/{$image}"));
     }
 }
