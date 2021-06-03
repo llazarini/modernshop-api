@@ -25,7 +25,7 @@ class FileController extends Controller
         $file->type = $request->get('type');
         $file->type_id = $request->get('type_id');
         $typeUrl = Str::slug($file->type);
-        if (env('APP_ENV') == 'production') {
+        if (!(env('APP_ENV') == 'local')) {
             Image::configure(array('driver' => 'imagick'));
         }
         $image = Image::make($requestFile);
