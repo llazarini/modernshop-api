@@ -29,6 +29,7 @@ class FileController extends Controller
             Image::configure(array('driver' => 'imagick'));
         }
         $image = Image::make($requestFile);
+        Storage::makeDirectory("public/{$typeUrl}");
         if(!$file->save() || !$image->save(storage_path("app/public/{$typeUrl}/{$file->name}"), 80, 'jpg')) {
             return response()->json([
                 'message' => __("Erro ao tentar fazer upload."),
