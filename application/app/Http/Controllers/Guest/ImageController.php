@@ -21,7 +21,7 @@ class ImageController extends Controller
             $height = 200;
         }
         $size = "{$width}x{$height}";
-        $manager = new ImageManager(array('driver' => 'imagick'));
+        $manager = new ImageManager(array('driver' => 'gd'));
         if (Storage::exists("public/{$type}/{$size}/{$image}")) {
             return response()->redirectTo(Storage::url("public/{$type}/{$size}/{$image}"));
         } else if (!Storage::exists("public/{$type}/{$image}")) {
