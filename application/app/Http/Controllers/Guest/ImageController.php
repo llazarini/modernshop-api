@@ -25,11 +25,10 @@ class ImageController extends Controller
         }
         $make = Image::make(Storage::get("public/{$type}/{$image}"));
         $make->fit($width, $height);
-        $make->limitColors(255);
         if (!Storage::makeDirectory("public/{$type}/{$size}")) {
             return response()->redirectTo(public_path('default.png'));
         }
-        $make->save(storage_path("app/public/{$type}/{$size}/{$image}"), 90);
+        $make->save(storage_path("app/public/{$type}/{$size}/{$image}"), 100);
         return response()->redirectTo(Storage::url("public/{$type}/{$size}/{$image}"));
     }
 }
