@@ -25,7 +25,6 @@ class FileController extends Controller
         $file->type = $request->get('type');
         $file->type_id = $request->get('type_id');
         $typeUrl = Str::slug($file->type);
-        Image::configure(array('driver' => 'imagick'));
         $image = Image::make($requestFile);
         Storage::makeDirectory("public/{$typeUrl}");
         if(!$file->save() || !$image->save(storage_path("app/public/{$typeUrl}/{$file->name}"), 80, 'jpg')) {
