@@ -20,9 +20,7 @@ class ImageController extends Controller
             $height = 200;
         }
         $size = "{$width}x{$height}";
-        if (!(env('APP_ENV') == 'local')) {
-            Image::configure(array('driver' => 'imagick'));
-        }
+        Image::configure(array('driver' => 'imagick'));
         if (Storage::exists("public/{$type}/{$size}/{$image}")) {
             return response()->redirectTo(Storage::url("public/{$type}/{$size}/{$image}"));
         } else if (!Storage::exists("public/{$type}/{$image}")) {
