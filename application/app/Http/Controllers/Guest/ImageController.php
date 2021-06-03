@@ -20,8 +20,7 @@ class ImageController extends Controller
             $height = 200;
         }
         $size = "{$width}x{$height}";
-        if (!env('IMAGE_DRIVER')) {
-            exit;
+        if (env('APP_ENV') == 'production') {
             Image::configure(array('driver' => 'imagick'));
         }
         if (Storage::exists("public/{$type}/{$size}/{$image}")) {
