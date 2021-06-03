@@ -9,6 +9,7 @@ use App\Models\File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Intervention\Image\Facades\Image;
 
 class FileController extends Controller
 {
@@ -18,14 +19,17 @@ class FileController extends Controller
         $file = new File();
         $file->company_id = $request->user()->company_id;
         $file->request_token = $request->get('request_token');
-        $file->name = $requestFile->hashName();
+        $file->name = explode('.', $requestFile->hashName())[0].'.jpg';
         $file->original_name = $requestFile->getFilename();
         $file->size = $requestFile->getSize();
         $file->type = $request->get('type');
         $file->type_id = $request->get('type_id');
         $typeUrl = Str::slug($file->type);
-        Storage::put("public/{$typeUrl}", $requestFile);
-        if(!$file->save()) {
+        if (extension_loaded('imagick')) {
+            Image::configure(array('driver' => 'imagick'));
+        }
+        $image = Image::make($requestFile);
+        if(!$file->save() || !$image->save(storage_path("app/public/{$typeUrl}/{$file->name}"), 80, 'jpg')) {
             return response()->json([
                 'message' => __("Erro ao tentar fazer upload."),
             ], 400);
