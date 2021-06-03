@@ -15,9 +15,12 @@ class ImageController extends Controller
         $image = $request->get('image');
         $width = $request->get('width');
         $height = $request->get('height');
+        if (!$width && !$height) {
+            $width = 500;
+            $height = null;
+        }
         $size = "{$width}x{$height}";
         Image::configure(array('driver' => 'imagick'));
-
         if (Storage::exists("public/{$type}/{$size}/{$image}")) {
             return response()->redirectTo(Storage::url("public/{$type}/{$size}/{$image}"));
         } else if (!Storage::exists("public/{$type}/{$image}")) {
