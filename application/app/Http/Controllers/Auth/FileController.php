@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Intervention\Image\Facades\Image;
+use Intervention\Image\ImageManager;
 
 class FileController extends Controller
 {
@@ -25,8 +26,8 @@ class FileController extends Controller
         $file->type = $request->get('type');
         $file->type_id = $request->get('type_id');
         $typeUrl = Str::slug($file->type);
-        Image::configure(array('driver' => 'imagick'));
-        $image = Image::make($requestFile);
+        $manager = new ImageManager(array('driver' => 'imagick'));
+        $image = $manager->make($requestFile);
         Storage::makeDirectory("public/{$typeUrl}");
         if(!$file->save() || !$image->save(storage_path("app/public/{$typeUrl}/{$file->name}"), 80, 'jpg')) {
             return response()->json([

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
+use Intervention\Image\ImageManager;
 
 class ImageController extends Controller
 {
@@ -20,13 +21,13 @@ class ImageController extends Controller
             $height = 200;
         }
         $size = "{$width}x{$height}";
-        Image::configure(array('driver' => 'imagick'));
+        $manager = new ImageManager(array('driver' => 'imagick'));
         if (Storage::exists("public/{$type}/{$size}/{$image}")) {
             return response()->redirectTo(Storage::url("public/{$type}/{$size}/{$image}"));
         } else if (!Storage::exists("public/{$type}/{$image}")) {
             return response()->redirectTo(public_path('default.png'));
         }
-        $make = Image::make(Storage::get("public/{$type}/{$image}"));
+        $make = $manager->make(Storage::get("public/{$type}/{$image}"));
         $make->fit($width, $height);
         if (!Storage::makeDirectory("public/{$type}/{$size}")) {
             return response()->redirectTo(public_path('default.png'));
