@@ -16,7 +16,7 @@ class ImageController extends Controller
         $width = $request->get('width');
         $height = $request->get('height');
         if (!$width && !$height) {
-            $width = 500;
+            $width = 200;
             $height = null;
         }
         $size = "{$width}x{$height}";
