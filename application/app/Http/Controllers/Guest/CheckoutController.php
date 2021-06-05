@@ -145,7 +145,7 @@ class CheckoutController extends Controller
                 'message' => __('Erro ao tentar trazer o envio, por favor tente mais tarde.')
             ], 400);
         }
-        $amount = $this->amount($request->get('products'));
+        $amount = $this->amount($request->get('products')) + $shipping->price;
         $order = new Order();
         $order->company_id = 1;
         $order->user_address_id = $user->main_address->id;
@@ -181,7 +181,6 @@ class CheckoutController extends Controller
                 $option = Option::find($optionId);
                 $price += $option->type ? (float) $option->price : (float)-$option->price;
             }
-            $price = round($price, 0);
             $total = $total + ($price * (int) $itemProduct['quantity']);
         }
         return $total;

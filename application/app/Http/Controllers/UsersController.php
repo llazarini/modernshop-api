@@ -7,6 +7,7 @@ use App\Mail\ForgotPasswordEmail;
 use App\Models\User;
 use App\Models\UserAddress;
 use App\Models\UserType;
+use App\Rules\ValidCep;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -94,12 +95,13 @@ class UsersController extends Controller
             'name' => ['required', 'max:200', 'min:10'],
             'password' => ['required', 'min:6', 'max:200', 'same:password_confirm'],
             'password_confirm' => ['required', 'min:6', 'max:200'],
+            'phone' => ['required', 'min:6', 'max:200'],
         ]);
         $user = new User();
+        $user->fill($request->all());
         $user->company_id = 1;
         $user->user_type_id = UserType::getId('client');
         $user->password = Hash::make($request->get('password'));
-        $user->fill($request->all());
         if (!$user->save()) {
             return response()->json([
                 'message' => __('Erro ao criar usuário')
@@ -119,12 +121,13 @@ class UsersController extends Controller
         $user = $request->user();
         $request->validate([
             'id' => ['nullable', 'exists:user_addresses,id'],
-            'zip_code' => ['required', 'min:8', 'max:8'],
+            'zip_code' => ['required', new ValidCep],
+            'state_id' => ['required', 'exists:states,id'],
+            'city_id' => ['required', 'exists:cities,id'],
             'street_name' => ['required', 'min:3'],
             'street_number' => ['required', 'numeric'],
             'complement' => ['nullable'],
-            'state_id' => ['required', 'exists:states,id'],
-            'city_id' => ['required', 'exists:cities,id'],
+            'neighborhood' => ['required', 'min:3'],
         ]);
         if ($request->get('id')) {
             $address = UserAddress::find($request->get('id'));
