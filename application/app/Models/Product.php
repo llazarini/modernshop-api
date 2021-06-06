@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 
 class Product extends BaseModel
 {
@@ -29,5 +30,11 @@ class Product extends BaseModel
             $attribute->options = Option::whereIn('id', $this->options->where('attribute_id', '=', $attribute->id)->pluck('id'))->get();
         }
         return $attributes;
+    }
+
+    public function toArray() {
+        $row = parent::toArray();
+        $row['slug'] = Str::slug($this->attributes['name']);
+        return $row;
     }
 }

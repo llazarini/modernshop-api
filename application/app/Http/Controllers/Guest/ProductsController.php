@@ -28,7 +28,9 @@ class ProductsController extends Controller
                 $has->whereCategoryId($request->get('category_id'));
             });
         }
-        $products = $products->paginate(10);
+        $products = $products
+            ->orderBy('updated_at', 'DESC')
+            ->paginate(10);
         return response()->json($products);
     }
 
@@ -55,7 +57,8 @@ class ProductsController extends Controller
         ]);
         $product = Product::with([
                 'files',
-                'options'
+                'options',
+                'categories',
             ])
             ->find($request->get('id'));
         $product->attributes = $product->attributes();
