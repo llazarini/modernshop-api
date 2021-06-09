@@ -70,6 +70,11 @@ class PaymentStatusesSeeder extends Seeder
                 "name" => "Pedido enviado",
                 "slug" => "sent",
             ),
+            array(
+                "id" => 12,
+                "name" => "Cancelado",
+                "slug" => "cancel",
+            ),
         );
         DB::table('payment_statuses')->insert($plans);
     }

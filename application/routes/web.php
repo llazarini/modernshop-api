@@ -13,4 +13,4 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/image', [\App\Http\Controllers\Guest\ImageController::class, 'image']);
+Route::get('/image', [\App\Http\Controllers\Site\ImageController::class, 'image']);

@@ -2,9 +2,10 @@
 
 namespace App\Store\Shipping;
 
-use App\Models\Option;
 use App\Models\Product;
 use App\Models\ProductOption;
+use App\Models\ShippingCompany;
+use App\Models\ShippingOption;
 use GuzzleHttp\Client;
 
 class MelhorEnvio implements Shipping
@@ -52,8 +53,15 @@ class MelhorEnvio implements Shipping
                 if (isset($option->error) && $option->error) {
                     continue;
                 }
+                $shippingCompany = ShippingCompany::firstOrCreate([
+                    'name' => $option->company->name,
+                ]);
+                $shippingOption = ShippingOption::firstOrCreate([
+                    'shipping_company_id' => $shippingCompany->id,
+                    'name' => $option->name,
+                ]);
                 $shippings->push([
-                    'id' => $option->id,
+                    'id' => $shippingOption->id,
                     'name' => $option->name,
                     'company' => $option->company->name,
                     'image' => $option->company->picture,

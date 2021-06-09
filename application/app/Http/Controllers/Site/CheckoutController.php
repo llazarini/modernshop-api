@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Guest;
+namespace App\Http\Controllers\Site;
 
 use App\Http\Controllers\Controller;
 use App\Mail\OrderSuccessEmail;
@@ -92,7 +92,7 @@ class CheckoutController extends Controller
         $order->external_id = $payment->id;
         $order->external_type = 'pagarme';
         $order->shipment = $shipping->price;
-        $order->shipment_option = sprintf('%s - %s', $shipping->name, $shipping->company);
+        $order->shipping_option_id = $shipping->id;
         $order->discount = 0;
         $order->amount_without_shipment = ($payment->paid_amount / 100) - $shipping->price;
         $order->amount = $payment->paid_amount / 100;
@@ -155,7 +155,7 @@ class CheckoutController extends Controller
         $order->external_id = 0;
         $order->external_type = 'pix';
         $order->shipment = $shipping->price;
-        $order->shipment_option = sprintf('%s - %s', $shipping->name, $shipping->company);
+        $order->shipping_option_id = $request->get('shipping_option_id');
         $order->discount = 0;
         $order->amount_without_shipment = $amount - $shipping->price;
         $order->amount = $amount;

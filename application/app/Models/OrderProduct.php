@@ -24,7 +24,7 @@ class OrderProduct extends BaseModel
         return $this->belongsTo(Product::class);
     }
 
-    public function options() {
-        return $this->hasManyThrough(Option::class, OrderProductOption::class, 'option_id', 'id');
+    public function order_product_options() {
+        return $this->hasMany(OrderProductOption::class);
     }
 }

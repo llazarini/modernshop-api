@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Store\Payment\PagarmeCreditCard;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Order extends BaseModel
@@ -11,8 +12,18 @@ class Order extends BaseModel
     public static $searchFields = ['name'];
 
     protected $fillable = [
-        'payment_type_id', 'payment_status_id', 'amount_without_discount', 'amout', 'discount',
+        'payment_type_id', 'payment_status_id', 'amount_without_discount', 'amout', 'discount', 'tracking_code',
     ];
+
+    public static function refund($order)
+    {
+        if ($order->external_type == 'pix') {
+            return true;
+        } else if ($order->external_type == 'pagarme') {
+            return PagarmeCreditCard::refund($order);
+        }
+        return false;
+    }
 
     public function payment_type() {
         return $this->belongsTo(PaymentType::class);

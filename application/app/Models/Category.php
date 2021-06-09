@@ -19,7 +19,8 @@ class Category extends BaseModel
         'slug', 'name', 'description',
     ];
 
-    public function products() {
+    public function products()
+    {
         return $this->belongsToMany(Product::class, 'product_category');
     }
 }

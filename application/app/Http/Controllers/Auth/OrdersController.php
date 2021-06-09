@@ -13,7 +13,6 @@ class OrdersController extends Controller
 {
     public function index(Request $request)
     {
-        $user = $request->user();
         $data = Order::with([
             'payment_type',
             'payment_status',
@@ -22,7 +21,7 @@ class OrdersController extends Controller
                     'product' => function($with) {
                         $with->withTrashed();
                     },
-                    'options' => function($with) {
+                    'order_product_options.option' => function($with) {
                         $with->withTrashed();
                     }
                 ]);
@@ -55,7 +54,8 @@ class OrdersController extends Controller
     {
         $request->validate([
             'id' => ['required', 'exists:orders,id'],
-            'status' => ['required', 'exists:payment_statuses,slug']
+            'status' => ['required', 'exists:payment_statuses,slug'],
+            'tracking_code' => ['nullable'],
         ]);
         $order = Order::find($request->get('id'));
         if ($order->payment_status_id === PaymentStatus::slug($request->get('status'))) {
@@ -63,8 +63,11 @@ class OrdersController extends Controller
                 'message' => __('O pedido já se encontra nesse status de atualização.', 400)
             ]);
         }
+        if ($request->filled('tracking_code')) {
+            $order->tracking_code = $request->get('tracking_code');
+        }
         $order->payment_status_id = PaymentStatus::slug($request->get('status'));
-        if(!$order->save()) {
+        if(!Order::refund($order) || !$order->save()) {
             return response()->json([
                 'message' => __('Erro ao atualizar status do pedido.', 400)
             ]);

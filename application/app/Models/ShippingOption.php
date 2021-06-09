@@ -4,11 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Attribute extends BaseModel
+class ShippingOption extends BaseModel
 {
-    use SoftDeletes, FileTrait;
-
+    use SoftDeletes;
     protected $fillable = [
-        'name', 'description'
+        'shipping_company_id',
+        'name',
     ];
 }

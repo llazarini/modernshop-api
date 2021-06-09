@@ -7,9 +7,9 @@ use App\Http\Controllers\Auth\CategoriesController;
 use App\Http\Controllers\Auth\FileController;
 use App\Http\Controllers\Auth\OptionsController;
 use App\Http\Controllers\Auth\ProductsController;
-use App\Http\Controllers\Guest\CheckoutController;
-use App\Http\Controllers\Guest\OrdersController;
-use App\Http\Controllers\Guest\ProductsController as GuestProductsController;
+use App\Http\Controllers\Site\CheckoutController;
+use App\Http\Controllers\Site\OrdersController;
+use App\Http\Controllers\Site\ProductsController as GuestProductsController;
 use App\Http\Controllers\Auth\StatesController;
 use App\Http\Controllers\UsersController;
 use Illuminate\Support\Facades\Route;
@@ -21,7 +21,7 @@ Route::group(['prefix' => '/states'], function () {
 });
 Route::group(['prefix' => 'guest'], function() {
     Route::group(['prefix' => '/categories'], function () {
-        Route::get('/index', [\App\Http\Controllers\Guest\CategoriesController::class, 'index']);
+        Route::get('/index', [\App\Http\Controllers\Site\CategoriesController::class, 'index']);
     });
 
     Route::group(['prefix' => '/products'], function () {
@@ -32,7 +32,7 @@ Route::group(['prefix' => 'guest'], function() {
     });
 
     Route::group(['prefix' => '/banners'], function () {
-        Route::get('/category', [\App\Http\Controllers\Guest\BannersController::class, 'category']);
+        Route::get('/category', [\App\Http\Controllers\Site\BannersController::class, 'category']);
     });
 
     Route::group(['prefix' => '/checkout'], function () {

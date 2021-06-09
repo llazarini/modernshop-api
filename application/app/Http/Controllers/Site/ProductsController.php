@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Guest;
+namespace App\Http\Controllers\Site;
 
 use App\Http\Controllers\Controller;
 use App\Models\Attribute;
@@ -29,6 +29,7 @@ class ProductsController extends Controller
             });
         }
         $products = $products
+            ->whereHas('options')
             ->orderBy('updated_at', 'DESC')
             ->paginate(10);
         return response()->json($products);

@@ -3,12 +3,18 @@
 namespace App\Store\Payment;
 
 use App\Models\Option;
+use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
 use PagarMe\Client;
 
 class PagarmeCreditCard implements Payment
 {
+    private static function client()
+    {
+        return new Client(env('APP_ENV') === 'production' ? env('PAGARME_LIVE_KEY') : env('PAGARME_SANDBOX_KEY'));
+    }
+
     public static function payment($card, $user, $products, $shipping)
     {
         $card = (object) $card;
@@ -46,7 +52,7 @@ class PagarmeCreditCard implements Payment
         }
         $shippingPrice = round($shipping->price * 100, 0);
         $total = $total + $shippingPrice;
-        $pagarme = new Client(env('APP_ENV') === 'production' ? env('PAGARME_LIVE_KEY') : env('PAGARME_SANDBOX_KEY'));
+        $pagarme = PagarmeCreditCard::client();
         $transaction = $pagarme->transactions()->create([
             'amount' => $total,
             'payment_method' => 'credit_card',
@@ -82,5 +88,22 @@ class PagarmeCreditCard implements Payment
             'items' => $items->toArray()
         ]);
         return $transaction;
+    }
+
+    public static function refund(Order $order)
+    {
+        if ($order->external_type != self::getExternalType()) {
+            return false;
+        }
+        $client = PagarmeCreditCard::client();
+        $response = $client->transactions()->refund([
+            'id' => $order->external_id,
+        ]);
+        return $response;
+    }
+
+    private static function getExternalType()
+    {
+        return 'pagarme';
     }
 }

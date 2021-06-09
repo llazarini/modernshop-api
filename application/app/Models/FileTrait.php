@@ -10,7 +10,6 @@ trait FileTrait
         parent::boot();
         static::created(function($record) {
             $request = request();
-            Log::debug(self::class);
             File::whereType(self::class)
                 ->whereRequestToken($request->get('request_token'))
                 ->whereNull('type_id')

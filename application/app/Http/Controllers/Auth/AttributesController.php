@@ -31,6 +31,7 @@ class AttributesController extends Controller
     {
         $request->validate([
             'name' => ['required'],
+            'description' => ['max:2048'],
         ]);
         $user = $request->user();
         $data = Attribute::whereCompanyId($user->company_id)
@@ -52,6 +53,7 @@ class AttributesController extends Controller
         $user = $request->user();
         $request->validate([
             'name' => ['required'],
+            'description' => ['max:2048'],
         ]);
         $data = new Attribute();
         $data->company_id = $user->company_id;
