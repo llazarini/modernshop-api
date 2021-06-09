@@ -67,7 +67,12 @@ class OrdersController extends Controller
             $order->tracking_code = $request->get('tracking_code');
         }
         $order->payment_status_id = PaymentStatus::slug($request->get('status'));
-        if(!Order::refund($order) || !$order->save()) {
+        if ($request->get('status') === 'sent' && !Order::refund($order)) {
+            return response()->json([
+                'message' => __('Erro ao fazer estorno do pedido.', 400)
+            ]);
+        }
+        if(!$order->save()) {
             return response()->json([
                 'message' => __('Erro ao atualizar status do pedido.', 400)
             ]);
