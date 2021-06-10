@@ -67,7 +67,7 @@ class OrdersController extends Controller
             $order->tracking_code = $request->get('tracking_code');
         }
         $order->payment_status_id = PaymentStatus::slug($request->get('status'));
-        if ($request->get('status') === 'sent' && !Order::refund($order)) {
+        if ($order->external_type === 'pagarme' && $request->get('status') === 'sent' && !Order::refund($order)) {
             return response()->json([
                 'message' => __('Erro ao fazer estorno do pedido.', 400)
             ]);

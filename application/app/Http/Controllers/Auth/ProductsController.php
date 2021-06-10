@@ -31,6 +31,25 @@ class ProductsController extends Controller
         return response()->json($data, 200);
     }
 
+    public function similar(Request $request, $id)
+    {
+        $user = $request->user();
+        $similar = Product::whereCompanyId($user->company_id)
+            ->join('product_category', function ($join) {
+                $join
+                    ->on('product_category.product_id', 'products.id')
+                    ->whereNull('product_category.deleted_at');
+            })
+            ->limit(5)
+            ->get();
+        if(!$similar) {
+            return response()->json([
+                'message' => __("Erro ao tentar retornar registro."),
+            ], 400);
+        }
+        return response()->json($similar, 200);
+    }
+
     public function dataprovider(Request $request)
     {
         $categories = Category::get();
