@@ -9,12 +9,13 @@ class Company
 {
     public function handle(Request $request, Closure $next)
     {
-        $company = \App\Models\Company::whereDomain($request->getHost())
+        $domain = parse_url(request()->root())['host'];
+        $company = \App\Models\Company::whereDomain($domain)
             ->first();
         if (!$company) {
             return response()->json([
                 'message' => __("Empresa com domínio :domain não encontrado.", [
-                    'domain' => $request->getBaseUrl()
+                    'domain' => $domain
                 ])
             ], 400);
         }
