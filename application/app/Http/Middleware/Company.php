@@ -14,7 +14,7 @@ class Company
         if (!$company) {
             return response()->json([
                 'message' => __("Empresa com domínio :domain não encontrado.", [
-                    'domain' => $request->getHost()
+                    'domain' => $request->getBaseUrl()
                 ])
             ], 400);
         }
