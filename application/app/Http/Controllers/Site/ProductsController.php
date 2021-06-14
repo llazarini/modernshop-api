@@ -12,7 +12,8 @@ class ProductsController extends Controller
 {
     public function dataprovider(Request $request)
     {
-        $categories = Category::whereHas('products')
+        $categories = Category::whereCompanyId($request->get('company_id'))
+            ->whereHas('products')
             ->get();
         return response()->json(compact('categories'));
     }
@@ -22,7 +23,8 @@ class ProductsController extends Controller
         $request->validate([
             'category_id' => ['nullable', 'exists:categories,id']
         ]);
-        $products = Product::with(['files']);
+        $products = Product::whereCompanyId($request->get('company_id'))
+            ->with(['files']);
         if ($request->filled('category_id')) {
             $products->whereHas('categories', function($has) use ($request) {
                 $has->whereCategoryId($request->get('category_id'));
@@ -42,7 +44,8 @@ class ProductsController extends Controller
         ]);
         $category = Category::whereSlug($request->get('category'))
             ->first();
-        $data = Product::with(['files'])
+        $data = Product::whereCompanyId($request->get('company_id'))
+            ->with(['files'])
             ->select('products.*')
             ->join('product_category', 'product_category.product_id', 'products.id')
             ->groupBy('products.id')
@@ -56,7 +59,8 @@ class ProductsController extends Controller
         $request->validate([
             'id' => ['required', 'exists:products,id']
         ]);
-        $product = Product::with([
+        $product = Product::whereCompanyId($request->get('company_id'))
+            ->with([
                 'files',
                 'options',
                 'categories',

@@ -5,18 +5,16 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 
-class Company
+class Admin
 {
     public function handle(Request $request, Closure $next)
     {
-        $company = \App\Models\Company::whereDomain($request->getHost())
-            ->first();
-        if (!$company) {
+        $user = $request->user();
+        if ($user->user_type->slug !== 'admin') {
             return response()->json([
-                'message' => __("Company not found")
+                'message' => __('Você não tem acesso à essa área.')
             ], 400);
         }
-        $request->request->add(['company_id' => $company->id]);
         return $next($request);
     }
 }

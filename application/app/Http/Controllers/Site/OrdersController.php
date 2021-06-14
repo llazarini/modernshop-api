@@ -11,7 +11,8 @@ class OrdersController extends Controller
     public function index(Request $request)
     {
         $user = $request->user();
-        $orders = Order::with([
+        $orders = Order::whereCompanyId($request->get('company_id'))
+            ->with([
                 'payment_status',
                 'payment_type',
                 'order_products' => function($with) {
@@ -19,7 +20,7 @@ class OrdersController extends Controller
                         'product' => function($with) {
                             $with->withTrashed();
                         },
-                        'options' => function($with) {
+                        'order_product_options.option' => function($with) {
                             $with
                                 ->withTrashed();
                         }
@@ -41,7 +42,8 @@ class OrdersController extends Controller
             'id' => ['required', 'exists:orders,id']
         ]);
         $user = $request->user();
-        $products = Order::with(['payment_status', 'payment_type'])
+        $products = Order::whereCompanyId($request->get('company_id'))
+            ->with(['payment_status', 'payment_type'])
             ->whereUserId($user->id)
             ->find($request->get('id'));
         return response()->json($products);

@@ -14,9 +14,11 @@ class BannersController extends Controller
         $request->validate([
             'category' => ['required', 'exists:banner_categories,slug']
         ]);
-        $category = BannerCategory::whereSlug($request->get('category'))
+        $category = BannerCategory::whereCompanyId($request->get('company_id'))
+            ->whereSlug($request->get('category'))
             ->first();
-        $banners = Banner::whereBannerCategoryId($category->id)
+        $banners = Banner::whereCompanyId($request->get('company_id'))
+            ->whereBannerCategoryId($category->id)
             ->get();
         return response()->json($banners);
     }

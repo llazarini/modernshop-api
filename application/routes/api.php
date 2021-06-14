@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\AddressController;
 use App\Http\Controllers\Auth\AttributesController;
 use App\Http\Controllers\Auth\BannerCategoriesController;
 use App\Http\Controllers\Auth\CategoriesController;
+use App\Http\Controllers\Auth\DiscountsController;
 use App\Http\Controllers\Auth\FileController;
 use App\Http\Controllers\Auth\OptionsController;
 use App\Http\Controllers\Auth\ProductsController;
@@ -15,7 +16,6 @@ use App\Http\Controllers\UsersController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('auth/login', ['as' => 'login', 'uses' => 'UsersController@login']);
-
 Route::group(['prefix' => '/states'], function () {
     Route::get('/get-cities', [StatesController::class, 'getCities']);
 });
@@ -38,6 +38,7 @@ Route::group(['prefix' => 'guest'], function() {
     Route::group(['prefix' => '/checkout'], function () {
         Route::get('/basic', [CheckoutController::class, 'basic']);
         Route::post('/shipment', [CheckoutController::class, 'shipment']);
+        Route::post('/discount_code', [CheckoutController::class, 'discountCode']);
     });
     Route::post('/users/create', [UsersController::class, 'create']);
     Route::post('/forgot', [UsersController::class, 'forgot']);
@@ -58,8 +59,7 @@ Route::group(['prefix' => 'guest'], function() {
         });
     });
 });
-
-Route::group(['middleware' => 'auth:sanctum', 'prefix' => 'auth'], function() {
+Route::group(['middleware' => ['auth:sanctum', 'admin'], 'prefix' => 'auth'], function() {
     Route::group(['prefix' => '/address'], function () {
         Route::get('/zip_code', [AddressController::class, 'postalCode']);
     });
@@ -92,6 +92,14 @@ Route::group(['middleware' => 'auth:sanctum', 'prefix' => 'auth'], function() {
         Route::post('/store', [BannerCategoriesController::class, 'store']);
         Route::put('/update/{id}', [BannerCategoriesController::class, 'update']);
         Route::delete('/delete/{id}', [BannerCategoriesController::class, 'delete']);
+    });
+
+    Route::group(['prefix' => '/discounts'], function () {
+        Route::get('/get/{id}', [DiscountsController::class, 'get']);
+        Route::get('/get-all', [DiscountsController::class, 'index']);
+        Route::post('/store', [DiscountsController::class, 'store']);
+        Route::put('/update/{id}', [DiscountsController::class, 'update']);
+        Route::delete('/delete/{id}', [DiscountsController::class, 'delete']);
     });
 
     Route::group(['prefix' => '/categories'], function () {

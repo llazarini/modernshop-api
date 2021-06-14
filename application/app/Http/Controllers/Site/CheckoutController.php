@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Site;
 
 use App\Http\Controllers\Controller;
 use App\Mail\OrderSuccessEmail;
+use App\Models\Discount;
 use App\Models\Option;
 use App\Models\Order;
 use App\Models\OrderProduct;
@@ -50,6 +51,21 @@ class CheckoutController extends Controller
         return response()->json($shippings);
     }
 
+    public function discountCode(Request $request)
+    {
+        $request->validate([
+            'discount_code' => ['required'],
+        ]);
+        $discount = Discount::whereCode($request->input('discount_code'))
+            ->first();
+        if (!$discount) {
+            return response()->json([
+                'message' => __('Não encontramos nenhum código de cupom.')
+            ], 400);
+        }
+        return response()->json($discount);
+    }
+
     public function payment(Request $request)
     {
         $request->validate([
@@ -84,7 +100,7 @@ class CheckoutController extends Controller
         $status = PaymentStatus::whereSlug($payment->status)
             ->first();
         $order = new Order();
-        $order->company_id = 1;
+        $order->company_id = $request->get('company_id');
         $order->user_address_id = $user->main_address->id;
         $order->user_id = $user->id;
         $order->payment_type_id = PaymentType::slug('credit_card');
@@ -147,7 +163,7 @@ class CheckoutController extends Controller
         }
         $amount = $this->amount($request->get('products')) + $shipping->price;
         $order = new Order();
-        $order->company_id = 1;
+        $order->company_id = $request->get('company_id');
         $order->user_address_id = $user->main_address->id;
         $order->user_id = $user->id;
         $order->payment_type_id = PaymentType::slug('pix');

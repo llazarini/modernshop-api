@@ -2,6 +2,7 @@
 
 namespace App\Http;
 
+use App\Http\Middleware\Company;
 use App\Http\Middleware\Cors;
 use App\Http\Middleware\RequestUniqueId;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
@@ -34,6 +35,7 @@ class Kernel extends HttpKernel
             'throttle:api',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             RequestUniqueId::class,
+            Company::class,
         ],
     ];
 
@@ -54,5 +56,6 @@ class Kernel extends HttpKernel
         'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
+        'admin' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
     ];
 }
