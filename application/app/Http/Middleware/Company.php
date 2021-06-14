@@ -13,7 +13,9 @@ class Company
             ->first();
         if (!$company) {
             return response()->json([
-                'message' => __("Company not found")
+                'message' => __("Empresa com domínio :domain não encontrado.", [
+                    'domain' => $request->getHost()
+                ])
             ], 400);
         }
         $request->request->add(['company_id' => $company->id]);
