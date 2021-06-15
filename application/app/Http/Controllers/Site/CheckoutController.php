@@ -18,6 +18,7 @@ use App\Rules\ValidCpf;
 use App\Store\Payment\PagarmeCreditCard;
 use App\Store\Shipping\MelhorEnvio;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class CheckoutController extends Controller
@@ -79,7 +80,8 @@ class CheckoutController extends Controller
             'card.number' => ['required', 'numeric'],
             'card.cvc' => ['required', 'numeric'],
             'card.date' => ['required', 'numeric', new ValidCardDate],
-            'card.cpf' => ['required', new ValidCpf]
+            'card.cpf' => ['required', new ValidCpf],
+            'discount' => ['nullable', "exists:discounts,code,company_id,{$request->get('company_id')}"]
         ]);
         $user = User::with('main_address')
             ->find($request->user()->id);
@@ -95,37 +97,39 @@ class CheckoutController extends Controller
                 'message' => __('Erro ao tentar trazer o envio, por favor tente mais tarde.')
             ], 400);
         }
-        $payment = PagarmeCreditCard::payment($request->get('card'), $request->user(),
-            $request->get('products'), $shipping);
-        $status = PaymentStatus::whereSlug($payment->status)
+        $discount = Discount::whereCode($request->get('discount'))
+            ->whereCompanyId($request->get('company_id'))
             ->first();
+        try {
+            $payment = PagarmeCreditCard::payment($request->get('card'), $request->user(),
+                $request->get('products'), $shipping, $discount);
+        } catch (\Exception $exception) {
+            Log::emergency($exception->getTraceAsString());
+            Log::emergency($exception->getMessage());
+            return response()->json([
+                'message' => __('Ocorreu um erro no processamento do seu pagamento.')
+            ], 400);
+        }
         $order = new Order();
         $order->company_id = $request->get('company_id');
         $order->user_address_id = $user->main_address->id;
         $order->user_id = $user->id;
         $order->payment_type_id = PaymentType::slug('credit_card');
-        $order->payment_status_id = $status->id;
-        $order->external_id = $payment->id;
-        $order->external_type = 'pagarme';
-        $order->shipment = $shipping->price;
-        $order->shipping_option_id = $shipping->id;
-        $order->discount = 0;
-        $order->amount_without_shipment = ($payment->paid_amount / 100) - $shipping->price;
-        $order->amount = $payment->paid_amount / 100;
+        $order->fill((array) $payment);
         if (!$order->save()) {
             return response()->json([
                 'message' => __('Erro ao cadastrar ordem.')
             ], 400);
         }
         $this->saveOrderItems($order, $request);
-        if (!in_array($status->slug, ['processing', 'authorized', 'paid', 'waiting_payment'])) {
+        if (!in_array($payment->status->slug, ['processing', 'authorized', 'paid', 'waiting_payment'])) {
             return response()->json([
                 'message' => [
                     'title' => __('Aconteceu algum problema com seu pagamento', [
-                        'status' => $status->name
+                        'status' => $payment->status->name
                     ]),
                     'message' => __('Ocorreu algum erro com o seu pagamento, o seu pagamento foi :status. Por favor, revise os dados do seu cartão de crédito.', [
-                        'status' => $status->name
+                        'status' => $payment->status->name
                     ])
                 ]
             ], 400);
@@ -146,6 +150,7 @@ class CheckoutController extends Controller
             'products.*.options.*' => ['required', 'exists:options,id'],
             'products.*.quantity' => ['required', 'numeric'],
             'shipping_option_id' => ['required', 'numeric'],
+            'discount' => ['nullable', "exists:discounts,code,company_id,{$request->get('company_id')}"]
         ]);
         $user = User::with('main_address')
             ->find($request->user()->id);
@@ -156,12 +161,16 @@ class CheckoutController extends Controller
         }
         $shipping = MelhorEnvio::shipping($user->main_address->zip_code,
             $request->get('products'), $request->get('shipping_option_id'));
+        $discount = Discount::whereCode($request->get('discount'))
+            ->whereCompanyId($request->get('company_id'))
+            ->first();
         if (!$shipping) {
             return response()->json([
                 'message' => __('Erro ao tentar trazer o envio, por favor tente mais tarde.')
             ], 400);
         }
-        $amount = $this->amount($request->get('products')) + $shipping->price;
+        $amount = $this->amount($request->get('products'));
+        $discountPrice = Discount::applyDiscount($amount, $discount);
         $order = new Order();
         $order->company_id = $request->get('company_id');
         $order->user_address_id = $user->main_address->id;
@@ -172,9 +181,10 @@ class CheckoutController extends Controller
         $order->external_type = 'pix';
         $order->shipment = $shipping->price;
         $order->shipping_option_id = $request->get('shipping_option_id');
-        $order->discount = 0;
-        $order->amount_without_shipment = $amount - $shipping->price;
-        $order->amount = $amount;
+        $order->discount = $discountPrice;
+        $order->amount_without_discount = $amount + $discountPrice;
+        $order->amount_without_shipment = $amount;
+        $order->amount = $amount + $shipping->price;
         if (!$order->save()) {
             return response()->json([
                 'message' => __('Erro ao cadastrar ordem.')
