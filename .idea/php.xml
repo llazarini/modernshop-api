@@ -81,15 +81,10 @@
       <path value="$PROJECT_DIR$/application/vendor/fruitcake/laravel-cors" />
       <path value="$PROJECT_DIR$/application/vendor/fideloper/proxy" />
       <path value="$PROJECT_DIR$/application/vendor/hamcrest/hamcrest-php" />
-      <path value="$PROJECT_DIR$/application/vendor/spatie/image-optimizer" />
       <path value="$PROJECT_DIR$/application/vendor/sebastian/code-unit-reverse-lookup" />
-      <path value="$PROJECT_DIR$/application/vendor/spatie/browsershot" />
       <path value="$PROJECT_DIR$/application/vendor/sebastian/lines-of-code" />
-      <path value="$PROJECT_DIR$/application/vendor/spatie/temporary-directory" />
       <path value="$PROJECT_DIR$/application/vendor/sebastian/recursion-context" />
-      <path value="$PROJECT_DIR$/application/vendor/spatie/crawler" />
       <path value="$PROJECT_DIR$/application/vendor/sebastian/comparator" />
-      <path value="$PROJECT_DIR$/application/vendor/spatie/robots-txt" />
       <path value="$PROJECT_DIR$/application/vendor/sebastian/exporter" />
       <path value="$PROJECT_DIR$/application/vendor/sebastian/version" />
       <path value="$PROJECT_DIR$/application/vendor/sebastian/resource-operations" />
@@ -101,7 +96,6 @@
       <path value="$PROJECT_DIR$/application/vendor/sebastian/object-enumerator" />
       <path value="$PROJECT_DIR$/application/vendor/sebastian/cli-parser" />
       <path value="$PROJECT_DIR$/application/vendor/sebastian/diff" />
-      <path value="$PROJECT_DIR$/application/vendor/spatie/image" />
       <path value="$PROJECT_DIR$/application/vendor/sebastian/object-reflector" />
       <path value="$PROJECT_DIR$/application/vendor/phpdocumentor/reflection-docblock" />
       <path value="$PROJECT_DIR$/application/vendor/dragonmantank/cron-expression" />
@@ -111,13 +105,9 @@
       <path value="$PROJECT_DIR$/application/vendor/guzzlehttp/guzzle" />
       <path value="$PROJECT_DIR$/application/vendor/guzzlehttp/promises" />
       <path value="$PROJECT_DIR$/application/vendor/guzzlehttp/psr7" />
-      <path value="$PROJECT_DIR$/application/vendor/symfony/dom-crawler" />
       <path value="$PROJECT_DIR$/application/vendor/graham-campbell/result-type" />
       <path value="$PROJECT_DIR$/application/vendor/phpdocumentor/type-resolver" />
       <path value="$PROJECT_DIR$/application/vendor/phpdocumentor/reflection-common" />
-      <path value="$PROJECT_DIR$/application/vendor/league/glide" />
-      <path value="$PROJECT_DIR$/application/vendor/nicmart/tree" />
-      <path value="$PROJECT_DIR$/application/vendor/intervention/image" />
       <path value="$PROJECT_DIR$/application/vendor/composer" />
       <path value="$PROJECT_DIR$/application/vendor/psr/simple-cache" />
       <path value="$PROJECT_DIR$/application/vendor/clue/buzz-react" />
@@ -134,6 +124,18 @@
       <path value="$PROJECT_DIR$/application/vendor/ringcentral/psr7" />
       <path value="$PROJECT_DIR$/application/vendor/laravel/sanctum" />
       <path value="$PROJECT_DIR$/application/vendor/pagarme/pagarme-php" />
+      <path value="$PROJECT_DIR$/application/vendor/spatie/laravel-sitemap" />
+      <path value="$PROJECT_DIR$/application/vendor/spatie/image-optimizer" />
+      <path value="$PROJECT_DIR$/application/vendor/spatie/robots-txt" />
+      <path value="$PROJECT_DIR$/application/vendor/spatie/crawler" />
+      <path value="$PROJECT_DIR$/application/vendor/spatie/browsershot" />
+      <path value="$PROJECT_DIR$/application/vendor/spatie/image" />
+      <path value="$PROJECT_DIR$/application/vendor/spatie/temporary-directory" />
+      <path value="$PROJECT_DIR$/application/vendor/intervention/image" />
+      <path value="$PROJECT_DIR$/application/vendor/symfony/dom-crawler" />
+      <path value="$PROJECT_DIR$/application/vendor/nicmart/tree" />
+      <path value="$PROJECT_DIR$/application/vendor/league/glide" />
+      <path value="$PROJECT_DIR$/application/vendor/laravelium/sitemap" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="7.3" />

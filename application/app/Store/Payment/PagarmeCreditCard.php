@@ -87,14 +87,16 @@ class PagarmeCreditCard implements Payment
             ],
             'items' => $items->toArray()
         ]);
+        $discountValue = isset($discountValue) ? $discountValue : 0;
         $status = PaymentStatus::whereSlug($transaction->status)->first();
+        $amount = $transaction->paid_amount / 100;
         return (object) [
             'external_id' => $transaction->id,
             'external_type' => 'pagarme',
-            'discount' => isset($discountValue) ? $discountValue : 0,
+            'discount' => $discountValue,
             'amount_without_shipment' => ($transaction->paid_amount / 100) - $shipping->price,
-            'amount_without_discount' => $total + $discountValue,
-            'amount' => $transaction->paid_amount / 100,
+            'amount_without_discount' => $amount - $discountValue,
+            'amount' => $amount,
             'status' => $status,
             'payment_status_id' => $status->id,
             'shipment' => $shipping->price,

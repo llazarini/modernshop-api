@@ -9,7 +9,8 @@ class Company
 {
     public function handle(Request $request, Closure $next)
     {
-        $domain = parse_url($request->root())['host'];
+        $domain = request()->headers->get('referer');
+        $domain = parse_url($domain)['host'];
         $company = \App\Models\Company::whereDomain($domain)
             ->first();
         if (!$company) {

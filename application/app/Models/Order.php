@@ -12,7 +12,9 @@ class Order extends BaseModel
     public static $searchFields = ['name'];
 
     protected $fillable = [
-        'payment_type_id', 'payment_status_id', 'amount_without_discount', 'amout', 'discount', 'tracking_code',
+        'payment_type_id', 'payment_status_id', 'amount_without_discount', 'amount', 'discount', 'tracking_code',
+        'external_id', 'external_type', 'shipping_option_id', 'shipment', 'tracking_code', 'amount_without_shipment',
+
     ];
 
     public static function refund($order)
