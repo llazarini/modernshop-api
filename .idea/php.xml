@@ -124,17 +124,7 @@
       <path value="$PROJECT_DIR$/application/vendor/ringcentral/psr7" />
       <path value="$PROJECT_DIR$/application/vendor/laravel/sanctum" />
       <path value="$PROJECT_DIR$/application/vendor/pagarme/pagarme-php" />
-      <path value="$PROJECT_DIR$/application/vendor/spatie/laravel-sitemap" />
-      <path value="$PROJECT_DIR$/application/vendor/spatie/image-optimizer" />
-      <path value="$PROJECT_DIR$/application/vendor/spatie/robots-txt" />
-      <path value="$PROJECT_DIR$/application/vendor/spatie/crawler" />
-      <path value="$PROJECT_DIR$/application/vendor/spatie/browsershot" />
-      <path value="$PROJECT_DIR$/application/vendor/spatie/image" />
-      <path value="$PROJECT_DIR$/application/vendor/spatie/temporary-directory" />
       <path value="$PROJECT_DIR$/application/vendor/intervention/image" />
-      <path value="$PROJECT_DIR$/application/vendor/symfony/dom-crawler" />
-      <path value="$PROJECT_DIR$/application/vendor/nicmart/tree" />
-      <path value="$PROJECT_DIR$/application/vendor/league/glide" />
       <path value="$PROJECT_DIR$/application/vendor/laravelium/sitemap" />
     </include_path>
   </component>
