@@ -81,6 +81,7 @@ class CheckoutController extends Controller
             'card.cvc' => ['required', 'numeric'],
             'card.date' => ['required', 'numeric', new ValidCardDate],
             'card.cpf' => ['required', new ValidCpf],
+            'card.installments' => ['required', 'numeric', 'min:1', 'max:12'],
             'discount' => ['nullable', "exists:discounts,code,company_id,{$request->get('company_id')}"]
         ]);
         $user = User::with('main_address')
@@ -101,13 +102,18 @@ class CheckoutController extends Controller
             ->whereCompanyId($request->get('company_id'))
             ->first();
         try {
-            $payment = PagarmeCreditCard::payment($request->get('card'), $request->user(),
-                $request->get('products'), $shipping, $discount);
+            $payment = PagarmeCreditCard::payment(
+                $request->get('card'),
+                $request->user(),
+                $request->get('products'),
+                $shipping,
+                $discount);
         } catch (\Exception $exception) {
             Log::emergency($exception->getTraceAsString());
             Log::emergency($exception->getMessage());
             return response()->json([
-                'message' => __('Ocorreu um erro no processamento do seu pagamento.')
+                'message' => __('Puxa :/ Ocorreu um erro no processamento do seu pagamento. Mas tente mais
+                tarde! Os desenvolvedores já foram avisados.')
             ], 400);
         }
         $order = new Order();
@@ -219,10 +225,10 @@ class CheckoutController extends Controller
         }
         foreach($request->get('products', []) as $itemProduct) {
             $product = Product::find($itemProduct['id']);
-            $price = 0;
+            $price = $product->price;
             foreach($itemProduct['options'] as $optionId) {
                 $option = Option::find($optionId);
-                $price += (float) $product->price + ($option->type ? (float) $option->price : (float)-$option->price);
+                $price += ($option->type ? (float) $option->price : (float)-$option->price);
             }
             $orderProduct = new OrderProduct();
             $orderProduct->order_id = $order->id;

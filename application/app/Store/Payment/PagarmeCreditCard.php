@@ -40,7 +40,7 @@ class PagarmeCreditCard implements Payment
             $price = $product->price;
             foreach($itemProduct['options'] as $optionId) {
                 $option = Option::find($optionId);
-                $price += $option->type ? $option->price : -$option->price;
+                $price = $price + ($option->type ? $option->price : -$option->price);
             }
             $items->push([
                 'id' => (string) $product->id,
@@ -60,6 +60,7 @@ class PagarmeCreditCard implements Payment
             'card_cvv' => $card->cvc,
             'card_number' => $card->number,
             'card_expiration_date' => $card->date,
+            'installments' => $card->installments,
             'customer' => [
                 'external_id' => (string) $user->id,
                 'name' => $user->name,
@@ -100,6 +101,7 @@ class PagarmeCreditCard implements Payment
             'status' => $status,
             'payment_status_id' => $status->id,
             'shipment' => $shipping->price,
+            'installments' => $card->installments,
             'shipping_option_id' => $shipping->id,
         ];
     }

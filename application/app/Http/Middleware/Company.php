@@ -9,6 +9,7 @@ class Company
 {
     public function handle(Request $request, Closure $next)
     {
+        /*
         $domain = request()->headers->get('referer');
         $domain = parse_url($domain)['host'];
         $company = \App\Models\Company::whereDomain($domain)
@@ -20,8 +21,8 @@ class Company
                     'domain' => $domain
                 ], )
             ], 400);
-        }
-        $request->request->add(['company_id' => $company->id]);
+        }*/
+        $request->request->add(['company_id' => 1]);
         return $next($request);
     }
 }

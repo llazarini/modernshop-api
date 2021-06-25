@@ -14,7 +14,7 @@ class Order extends BaseModel
     protected $fillable = [
         'payment_type_id', 'payment_status_id', 'amount_without_discount', 'amount', 'discount', 'tracking_code',
         'external_id', 'external_type', 'shipping_option_id', 'shipment', 'tracking_code', 'amount_without_shipment',
-
+        'installments',
     ];
 
     public static function refund($order)
