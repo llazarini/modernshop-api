@@ -9,20 +9,16 @@ class Company
 {
     public function handle(Request $request, Closure $next)
     {
-        /*
-        $domain = request()->headers->get('referer');
-        $domain = parse_url($domain)['host'];
-        $company = \App\Models\Company::whereDomain($domain)
+        $company = \App\Models\Company::whereDomain($request->header('Site'))
             ->first();
         if (!$company) {
             return response()->json([
-                'aaa' => $request->root(),
                 'message' => __("Empresa com domínio :domain não encontrado.", [
-                    'domain' => $domain
-                ], )
+                    'domain' => $request->header('Site')
+                ])
             ], 400);
-        }*/
-        $request->request->add(['company_id' => 1]);
+        }
+        $request->request->add(['company_id' => $company->id]);
         return $next($request);
     }
 }

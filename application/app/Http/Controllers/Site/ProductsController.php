@@ -7,6 +7,7 @@ use App\Models\Attribute;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class ProductsController extends Controller
 {
@@ -50,7 +51,7 @@ class ProductsController extends Controller
             ->join('product_category', 'product_category.product_id', 'products.id')
             ->groupBy('products.id')
             ->where('product_category.category_id', $category->id)
-            ->paginate(4);
+            ->paginate(5);
         return response()->json($data);
     }
 

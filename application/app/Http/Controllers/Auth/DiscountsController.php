@@ -38,6 +38,8 @@ class DiscountsController extends Controller
     {
         $request->validate([
             'name' => ['required'],
+            'code' => ['required', 'min:2'],
+            'value' => ['required', 'numeric'],
         ]);
         $user = $request->user();
         $data = Discount::whereCompanyId($user->company_id)
@@ -59,6 +61,8 @@ class DiscountsController extends Controller
         $user = $request->user();
         $request->validate([
             'name' => ['required'],
+            'code' => ['required', 'min:2'],
+            'value' => ['required', 'numeric'],
         ]);
         $data = new Discount();
         $data->company_id = $user->company_id;

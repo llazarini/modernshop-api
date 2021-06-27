@@ -1,16 +1,8 @@
 version: '3'
 
 services:
-  php-worker:
-    image: intmer/supervisor-php7.2-laravel
-    volumes:
-      - ./docker/php-worker/supervisord.conf:/etc/supervisor/conf.d/supervisord.conf
-      - ./docker/php-worker/logs:/var/worker/logs/
-      - ./application:/var/www
-    networks:
-      - backend
   php:
-    image: atillay/lemp-php
+    image: php:7.4-fpm
     volumes:
       - ./docker/php/php.ini:/usr/local/etc/php/php.ini
       - ./application:/var/www
@@ -18,18 +10,16 @@ services:
       - 9000:9000
     networks:
       - backend
-
   nginx:
-    image: staticfloat/nginx-certbot
+    image: nginx
     ports:
       - 80:80
       - 443:443
     environment:
-      CERTBOT_EMAIL: leonardo@laitsoft.com
+      - NGINX_HOST=foobar.com
+      - NGINX_PORT=80
     volumes:
-      - ./docker/nginx/prod/nginx.conf:/etc/nginx/user.conf.d/nginx.conf
-      - ./docker/letsencrypt:/etc/letsencrypt
-      - ./docker/nginx/log:/var/log/nginx
+      - ./docker/nginx/local/nginx.conf:/etc/nginx/templates
       - ./application/public:/var/www/public
     networks:
       - backend

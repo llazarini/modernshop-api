@@ -2,23 +2,22 @@ version: '3'
 
 services:
   php:
-    image: bitnami/php-fpm:latest
+    image: atillay/lemp-php
     volumes:
-      - ./docker/php/php.ini:/opt/bitnami/php/etc/php.ini
-      - ./application:/app
+      - ./docker/php/php.ini:/usr/local/etc/php/php.ini
+      - ./application:/var/www
     ports:
       - 9000:9000
     networks:
       - backend
   nginx:
-    image: bitnami/nginx:latest
+    image: atillay/lemp-nginx
     ports:
-      - 8081:8080
-      - 8443:8443
+      - 8081:80
     volumes:
-      - ./docker/nginx/local/nginx.conf:/opt/bitnami/nginx/conf/server_blocks/myapp.conf
+      - ./docker/nginx/local/nginx.conf:/etc/nginx/nginx.conf
       - ./docker/nginx/log:/var/log/nginx
-      - ./application:/app
+      - ./application/public:/var/www/public
     networks:
       - backend
     links:
