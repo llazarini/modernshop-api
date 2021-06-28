@@ -188,6 +188,11 @@ return [
         'password_confirmation' => 'confirmação da senha',
         'password_confirm' => 'confirmação da senha',
         'current_password' => 'senha atual',
+        'discount_code' => 'código de desconto',
+        'street_name' => 'Rua',
+        'street_number' => 'Número da Rua',
+        'complement' => 'Complemento',
+
     ],
 
 ];
