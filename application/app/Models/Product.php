@@ -35,6 +35,7 @@ class Product extends BaseModel
     public function toArray() {
         $row = parent::toArray();
         $row['slug'] = Str::slug($this->attributes['name']);
+        $row['url'] = sprintf('%s/product/view/%s/%s', env('APP_STORE_URL'), $row['id'], $row['slug']);
         return $row;
     }
 }

@@ -17,13 +17,14 @@ class CreateDiscountsTable extends Migration
             $table->increments('id');
             $table->unsignedInteger('company_id');
             $table->string('name');
-            $table->string('code');
-            $table->enum('type', ['value', 'percentage']);
-            $table->double('value');
+            $table->string('code')->nullable();
+            $table->enum('type', ['value', 'percentage', 'programmatic']);
+            $table->double('value')->nullable();
             $table->timestamps();
             $table->softDeletes();
             $table->foreign('company_id')
-                ->references('id')->on('companies')
+                ->references('id')
+                ->on('companies')
                 ->onDelete('cascade');
         });
     }

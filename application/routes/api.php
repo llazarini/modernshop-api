@@ -100,6 +100,7 @@ Route::group(['middleware' => ['auth:sanctum', 'admin'], 'prefix' => 'auth'], fu
         Route::post('/store', [DiscountsController::class, 'store']);
         Route::put('/update/{id}', [DiscountsController::class, 'update']);
         Route::delete('/delete/{id}', [DiscountsController::class, 'delete']);
+        Route::get('/dataprovider', [DiscountsController::class, 'dataprovider']);
     });
 
     Route::group(['prefix' => '/categories'], function () {

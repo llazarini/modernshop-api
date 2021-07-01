@@ -2,22 +2,42 @@
 
 namespace App\Store\Payment;
 
-use App\Models\Discount;
 use App\Models\Order;
-use App\Models\User;
+use App\Models\PaymentStatus;
+use App\Models\PaymentType;
+use Illuminate\Http\Request;
 
-class Pix implements Payment
+class Pix implements PaymentInterface
 {
-    public static function payment($card, User $user, $products, $shipping, ?Discount $discount)
-    {
-        $user = User::with([
-                'main_address.city.state'
-            ])
-            ->find($user->id);
+    use PaymentTrait;
 
+    private function getExternalType()
+    {
+        return 'pix';
     }
 
-    public static function refund(Order $order)
+    public function payment(Request $request, $shipping)
+    {
+        $this->process($request, $shipping);
+        return $this->processOrder();
+    }
+
+    public function processOrder() {
+        $order = $this->order();
+        $status = PaymentStatus::whereSlug('waiting_payment')->first();
+        $order->fill([
+            'external_id' => 0,
+            'external_type' => $this->getExternalType(),
+            'payment_type_id' => PaymentType::slug('pix'),
+            'status' => $status->slug,
+            'payment_status_id' => $status->id,
+        ]);
+        $order->saveOrFail();
+        $this->orderProducts($order);
+        return $order;
+    }
+
+    public function refund(Order $order)
     {
         return true;
     }
