@@ -13,6 +13,7 @@ class CategoriesController extends Controller
         $categories = Category::whereCompanyId($request->get('company_id'))
             ->with('file')
             ->whereHas('file')
+            ->orderBy('id', 'DESC')
             ->get();
         return response()->json($categories);
     }
