@@ -37,7 +37,7 @@ class CheckoutController extends Controller
     public function shipment(Request $request)
     {
         $request->validate([
-            'postal_code' => ['required'],
+            'postal_code' => ['nullable'],
             'products' => ['required', 'array'],
             'products.*.id' => ['required', 'exists:products,id'],
             'products.*.options' => ['required', 'array'],
@@ -46,11 +46,14 @@ class CheckoutController extends Controller
         ]);
         $products = collect($request->get('products'));
         $discounts = $this->progressiveDiscounts($this->options($products));
-        $shippings = MelhorEnvio::calculate($request->input('postal_code'), $request->input('products'));
-        if (!$shippings) {
-            return response()->json([
-                'message' => __('Ocorreu um erro ao tentar calcular o frete. Mas sem problemas, você ainda pode concluir sua compra!')
-            ], 400);
+        $shippings = [];
+        if ($request->filled('postal_code')) {
+            $shippings = MelhorEnvio::calculate($request->input('postal_code'), $request->input('products'));
+            if (!$shippings) {
+                return response()->json([
+                    'message' => __('Ocorreu um erro ao tentar calcular o frete. Mas sem problemas, você ainda pode concluir sua compra!')
+                ], 400);
+            }
         }
         return response()->json(compact('shippings', 'discounts'));
     }
