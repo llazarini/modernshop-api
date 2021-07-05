@@ -77,7 +77,7 @@ class MelhorEnvio implements Shipping
                 'company' => $option->company->name,
                 'image' => $option->company->picture,
                 'price' => isset($option->price) ? $option->price : 0,
-                'delivery_time' => $option->delivery_time
+                'delivery_time' => $option->delivery_time + 2
             ]);
         }
         return $shippings;
