@@ -23,7 +23,7 @@ class ImageController extends Controller
         $size = "{$width}x{$height}";
         $manager = new ImageManager(array('driver' => 'gd'));
         if (Storage::exists("public/{$type}/{$size}/{$image}")) {
-            return response()->redirectTo(Storage::url("public/{$type}/{$size}/{$image}"));
+            return response()->redirectTo(Storage::url("public/{$type}/{$size}/{$image}"), 301);
         } else if (!Storage::exists("public/{$type}/{$image}")) {
             return response()->redirectTo(public_path('default.png'));
         }
@@ -33,6 +33,6 @@ class ImageController extends Controller
             return response()->redirectTo(public_path('default.png'));
         }
         $make->save(storage_path("app/public/{$type}/{$size}/{$image}"), 85, 'jpg');
-        return response()->redirectTo(Storage::url("public/{$type}/{$size}/{$image}"));
+        return response()->redirectTo(Storage::url("public/{$type}/{$size}/{$image}"), 301);
     }
 }
